@@ -54,7 +54,7 @@ const EmployeeDashboard = () => {
 
     const fetchStatus = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/attendance/today', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/attendance/today', {
                 headers: { 'x-auth-token': token }
             });
             const data = await res.json();
@@ -121,7 +121,7 @@ const EmployeeDashboard = () => {
                 fetchOptions.body = JSON.stringify(credentials);
             }
 
-            const res = await fetch(`http://localhost:5000/api/attendance/${action}`, fetchOptions);
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/attendance/${action}`, fetchOptions);
             const data = await res.json();
 
             if (!res.ok) {
@@ -141,7 +141,7 @@ const EmployeeDashboard = () => {
     const fetchLeaves = async () => {
         setIsLoadingLeaves(true);
         try {
-            const res = await fetch('http://localhost:5000/api/attendance/leaves', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/attendance/leaves', {
                 headers: { 'x-auth-token': token }
             });
             if (res.ok) {
@@ -161,7 +161,7 @@ const EmployeeDashboard = () => {
     const fetchProfile = async (openModal = false) => {
         setIsLoadingProfile(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/me', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/me', {
                 headers: { 'x-auth-token': token }
             });
             if (res.ok) {
@@ -193,7 +193,7 @@ const EmployeeDashboard = () => {
         setIsSelfUpdating(true);
         setSelfUpdateError('');
         try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ const EmployeeDashboard = () => {
         }
         setIsSelfDeleting(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/profile', {
                 method: 'DELETE',
                 headers: {
                     'x-auth-token': token
@@ -337,7 +337,7 @@ const EmployeeDashboard = () => {
                             })
                         };
 
-                        const res = await fetch('http://localhost:5000/api/attendance/scan-qr', fetchOptions);
+                        const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/attendance/scan-qr', fetchOptions);
                         const data = await res.json();
 
                         if (!res.ok) {
@@ -452,8 +452,8 @@ const EmployeeDashboard = () => {
                         />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
-                            Hello, <span className="text-indigo-600 underline decoration-indigo-200 underline-offset-8 group-hover:text-indigo-700 transition-colors">{user.name?.split(' ')[0]}</span>!
+                        <h1 className="text-3xl font-black text-[#154c46] tracking-tight flex items-center gap-1.5">
+                            Hello, <span className="text-teal-500 underline decoration-teal-100 underline-offset-8 group-hover:text-teal-600 transition-colors">{user.name?.split(' ')[0]}</span>!
                         </h1>
                         <p className="text-slate-500 font-medium mt-1 flex items-center gap-2">
                             <Calendar size={16} />
@@ -467,12 +467,12 @@ const EmployeeDashboard = () => {
                     </div>
                 </div>
                 <div className="bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                    <div className="p-2 bg-teal-50 text-teal-500 rounded-xl">
                         <Clock size={20} />
                     </div>
                     <div className="text-right">
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Current Time</p>
-                        <p className="text-xl font-black text-slate-900 leading-none">
+                        <p className="text-xl font-black text-[#154c46] leading-none">
                             {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </p>
                     </div>
@@ -482,11 +482,11 @@ const EmployeeDashboard = () => {
             {/* Status Card */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 glass-card overflow-hidden bg-white border-slate-100 relative group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110 duration-500 opacity-50"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110 duration-500 opacity-50"></div>
 
                     <div className="p-8 relative">
                         <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-lg font-bold text-slate-800">Attendance Status</h3>
+                            <h3 className="text-lg font-bold text-[#1b5d55]">Attendance Status</h3>
                             <div className={`px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest flex items-center gap-2 ${isCheckedOut ? 'bg-slate-100 text-slate-500' :
                                 isCheckedIn ? (status?.status === 'Late' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600') :
                                     'bg-amber-50 text-amber-600'
@@ -506,7 +506,7 @@ const EmployeeDashboard = () => {
                                     <div className={`p-2 rounded-lg ${isCheckedIn ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-300'}`}>
                                         <LogIn size={18} />
                                     </div>
-                                    <p className={`text-xl font-black ${isCheckedIn ? 'text-slate-900' : 'text-slate-300'}`}>
+                                    <p className={`text-xl font-black ${isCheckedIn ? 'text-[#154c46]' : 'text-slate-300'}`}>
                                         {status?.check_in ? new Date(status.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
                                     </p>
                                 </div>
@@ -514,10 +514,10 @@ const EmployeeDashboard = () => {
                             <div className="space-y-2">
                                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Check-Out</p>
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${isCheckedOut ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-300'}`}>
+                                    <div className={`p-2 rounded-lg ${isCheckedOut ? 'bg-teal-50 text-teal-500' : 'bg-slate-50 text-slate-300'}`}>
                                         <LogOut size={18} />
                                     </div>
-                                    <p className={`text-xl font-black ${isCheckedOut ? 'text-slate-900' : 'text-slate-300'}`}>
+                                    <p className={`text-xl font-black ${isCheckedOut ? 'text-[#154c46]' : 'text-slate-300'}`}>
                                         {status?.check_out ? new Date(status.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
                                     </p>
                                 </div>
@@ -525,10 +525,10 @@ const EmployeeDashboard = () => {
                             <div className="space-y-2 col-span-2 md:col-span-1">
                                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Location Verified</p>
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${status?.latitude && status?.longitude ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-300'}`}>
+                                    <div className={`p-2 rounded-lg ${status?.latitude && status?.longitude ? 'bg-teal-50 text-teal-500' : 'bg-slate-50 text-slate-300'}`}>
                                         <ShieldCheck size={18} />
                                     </div>
-                                    <p className={`text-sm font-bold ${status?.latitude && status?.longitude ? 'text-slate-900' : 'text-slate-300'}`}>
+                                    <p className={`text-sm font-bold ${status?.latitude && status?.longitude ? 'text-[#154c46]' : 'text-slate-300'}`}>
                                         {status?.latitude && status?.longitude ? 'Verified (GPS)' : 'Not Available'}
                                     </p>
                                 </div>
@@ -544,7 +544,7 @@ const EmployeeDashboard = () => {
 
                         <div className="flex flex-col items-center justify-center p-6 bg-slate-50/60 rounded-2xl border border-slate-100 w-full">
                             <div className="text-center mb-4">
-                                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">ON DUTY Toggle Switch</p>
+                                <p className="text-[10px] font-black text-teal-400 uppercase tracking-widest">ON DUTY Toggle Switch</p>
                                 <h4 className="text-xs font-black text-slate-700 mt-1 uppercase tracking-wide">
                                     {!isCheckedIn ? "Slide to mark attendance (Check-In)" : !isCheckedOut ? "Shift Active (Slide to check out)" : "Shift completed today"}
                                 </h4>
@@ -586,18 +586,18 @@ const EmployeeDashboard = () => {
                     </div>
                 </div>
 
-                <div className="glass-card bg-slate-900 text-white p-8 relative overflow-hidden flex flex-col justify-between">
+                <div className="glass-card bg-[#154c46] text-white p-8 relative overflow-hidden flex flex-col justify-between">
                     <div className="absolute top-0 right-0 p-4 opacity-10">
                         <Timer size={120} />
                     </div>
 
                     <div className="relative">
-                        <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest mb-1">Working Hours</p>
+                        <p className="text-[11px] font-bold text-teal-300 uppercase tracking-widest mb-1">Working Hours</p>
                         <h3 className="text-4xl font-black tracking-tight font-mono">{workingHours}</h3>
                     </div>
 
                     <div className="relative pt-8 mt-8 border-t border-white/10">
-                        <div className="flex items-center gap-3 text-indigo-300 mb-4">
+                        <div className="flex items-center gap-3 text-teal-200 mb-4">
                             <AlertCircle size={14} />
                             <p className="text-[10px] font-bold uppercase tracking-widest">Session Insight</p>
                         </div>
@@ -615,12 +615,12 @@ const EmployeeDashboard = () => {
                 {/* History Card */}
                 <button 
                     onClick={() => navigate('/employee/history')}
-                    className="glass-card p-6 border-slate-100 hover:border-indigo-100 transition-all duration-300 group text-center flex flex-col items-center justify-center gap-3 w-full border-0 cursor-pointer focus:outline-none bg-white"
+                    className="glass-card p-6 border-slate-100 hover:border-teal-50 transition-all duration-300 group text-center flex flex-col items-center justify-center gap-3 w-full border-0 cursor-pointer focus:outline-none bg-white"
                 >
-                    <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-300">
+                    <div className="p-3 rounded-xl bg-teal-50 text-teal-500 group-hover:bg-[#154c46] group-hover:text-white transition-colors duration-300">
                         <HistoryIcon size={20} />
                     </div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-900">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-[#154c46]">
                         History
                     </span>
                 </button>
@@ -629,16 +629,16 @@ const EmployeeDashboard = () => {
                 <button 
                     onClick={fetchLeaves}
                     disabled={isLoadingLeaves}
-                    className="glass-card p-6 border-slate-100 hover:border-indigo-100 transition-all duration-300 group text-center flex flex-col items-center justify-center gap-3 w-full border-0 cursor-pointer focus:outline-none bg-white"
+                    className="glass-card p-6 border-slate-100 hover:border-teal-50 transition-all duration-300 group text-center flex flex-col items-center justify-center gap-3 w-full border-0 cursor-pointer focus:outline-none bg-white"
                 >
-                    <div className="p-3 rounded-xl bg-rose-50 text-rose-600 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-300">
+                    <div className="p-3 rounded-xl bg-rose-50 text-rose-600 group-hover:bg-[#154c46] group-hover:text-white transition-colors duration-300">
                         {isLoadingLeaves ? (
                             <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                         ) : (
                             <Calendar size={20} />
                         )}
                     </div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-900">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-[#154c46]">
                         {isLoadingLeaves ? 'Loading...' : 'Leaves'}
                     </span>
                 </button>
@@ -647,9 +647,9 @@ const EmployeeDashboard = () => {
                 <button 
                     onClick={() => fetchProfile(true)}
                     disabled={isLoadingProfile}
-                    className="glass-card p-6 border-slate-100 hover:border-indigo-100 transition-all duration-300 group text-center flex flex-col items-center justify-center gap-3 w-full border-0 cursor-pointer focus:outline-none bg-white"
+                    className="glass-card p-6 border-slate-100 hover:border-teal-50 transition-all duration-300 group text-center flex flex-col items-center justify-center gap-3 w-full border-0 cursor-pointer focus:outline-none bg-white"
                 >
-                    <div className="w-[44px] h-[44px] rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-300 flex items-center justify-center overflow-hidden shrink-0 p-1 border border-emerald-100/50 group-hover:border-transparent">
+                    <div className="w-[44px] h-[44px] rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-[#154c46] group-hover:text-white transition-colors duration-300 flex items-center justify-center overflow-hidden shrink-0 p-1 border border-emerald-100/50 group-hover:border-transparent">
                         {isLoadingProfile ? (
                             <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                         ) : (
@@ -660,7 +660,7 @@ const EmployeeDashboard = () => {
                             />
                         )}
                     </div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-slate-900">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-500 group-hover:text-[#154c46]">
                         {isLoadingProfile ? 'Loading...' : 'Profile'}
                     </span>
                 </button>
@@ -668,10 +668,10 @@ const EmployeeDashboard = () => {
 
             {/* Premium Leaves Modal */}
             {showLeavesModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#154c46]/60 backdrop-blur-md animate-in fade-in duration-300">
                     <div className="bg-white/95 rounded-3xl border border-slate-100 shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300 relative">
                         {/* Gradient Header Banner */}
-                        <div className="bg-gradient-to-r from-rose-500 via-pink-500 to-indigo-600 p-6 text-white relative">
+                        <div className="bg-gradient-to-r from-rose-500 via-pink-500 to-teal-500 p-6 text-white relative">
                             <div className="absolute top-4 right-4">
                                 <button 
                                     onClick={() => setShowLeavesModal(false)}
@@ -697,7 +697,7 @@ const EmployeeDashboard = () => {
                             <div className="bg-gradient-to-br from-rose-50 to-pink-50/30 rounded-2xl p-6 border border-rose-100 flex items-center justify-between">
                                 <div className="space-y-1">
                                     <span className="text-[11px] font-bold text-rose-500 uppercase tracking-widest">Total Leaves Taken</span>
-                                    <h4 className="text-4xl font-black text-slate-900 leading-none">{leaves.length}</h4>
+                                    <h4 className="text-4xl font-black text-[#154c46] leading-none">{leaves.length}</h4>
                                 </div>
                                 <div className="p-4 bg-white shadow-sm shadow-rose-100 text-rose-500 rounded-2xl border border-rose-100/50">
                                     <CalendarOff size={32} />
@@ -754,7 +754,7 @@ const EmployeeDashboard = () => {
                             <div className="pt-2">
                                 <button
                                     onClick={() => setShowLeavesModal(false)}
-                                    className="w-full py-3.5 bg-slate-900 hover:bg-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-indigo-100/30 border-0 cursor-pointer"
+                                    className="w-full py-3.5 bg-[#154c46] hover:bg-teal-500 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-teal-50/30 border-0 cursor-pointer"
                                 >
                                     Close Details
                                 </button>
@@ -766,11 +766,11 @@ const EmployeeDashboard = () => {
 
             {/* Premium Profile Modal */}
             {showProfileModal && profileData && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#154c46]/60 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
                     <div className="bg-white/95 rounded-3xl border border-slate-100 shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300 relative font-sans my-8">
                         {/* Elegant Pattern Banner */}
                         {/* Elegant Pattern Banner */}
-                        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 p-8 text-white relative flex flex-col items-center">
+                        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-500 p-8 text-white relative flex flex-col items-center">
                             <div className="absolute top-4 right-4">
                                 <button 
                                     onClick={() => setShowProfileModal(false)}
@@ -795,7 +795,7 @@ const EmployeeDashboard = () => {
                                     required
                                     value={selfEditData.name}
                                     onChange={(e) => setSelfEditData({ ...selfEditData, name: e.target.value })}
-                                    className="text-slate-800 text-sm font-bold text-center px-4 py-1 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"
+                                    className="text-[#1b5d55] text-sm font-bold text-center px-4 py-1 rounded-lg border border-slate-200 outline-none focus:border-teal-400 bg-white"
                                 />
                             ) : (
                                 <h3 className="text-xl font-black tracking-tight leading-none text-center">{profileData.name}</h3>
@@ -809,11 +809,11 @@ const EmployeeDashboard = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Access Role</span>
-                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">{profileData.role}</span>
+                                    <span className="text-xs font-black text-[#1b5d55] uppercase tracking-wider">{profileData.role}</span>
                                 </div>
                                 <div className="space-y-1 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Department</span>
-                                    <span className="text-xs font-black text-slate-800 tracking-wider">{profileData.department || 'General'}</span>
+                                    <span className="text-xs font-black text-[#1b5d55] tracking-wider">{profileData.department || 'General'}</span>
                                 </div>
                             </div>
 
@@ -829,7 +829,7 @@ const EmployeeDashboard = () => {
                                 <div className="space-y-4 pt-4 border-t border-slate-100">
                                     {/* Email */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Sparkles size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -840,7 +840,7 @@ const EmployeeDashboard = () => {
                                                     required
                                                     value={selfEditData.email}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, email: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white"
                                                 />
                                             ) : (
                                                 <span className="text-xs font-bold text-slate-700">{profileData.email}</span>
@@ -850,7 +850,7 @@ const EmployeeDashboard = () => {
 
                                     {/* Phone Number */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Phone size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -860,7 +860,7 @@ const EmployeeDashboard = () => {
                                                     type="text"
                                                     value={selfEditData.phone}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, phone: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white"
                                                     placeholder="e.g. +91 9876543210"
                                                 />
                                             ) : (
@@ -871,7 +871,7 @@ const EmployeeDashboard = () => {
 
                                     {/* Gender */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <User size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -880,7 +880,7 @@ const EmployeeDashboard = () => {
                                                 <select
                                                     value={selfEditData.gender}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, gender: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white text-slate-700"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white text-slate-700"
                                                 >
                                                     <option value="">Select Gender</option>
                                                     <option value="Male">Male</option>
@@ -895,7 +895,7 @@ const EmployeeDashboard = () => {
 
                                     {/* Joined Date */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Calendar size={16} />
                                         </div>
                                         <div className="text-left">
@@ -933,7 +933,7 @@ const EmployeeDashboard = () => {
                                             <button
                                                 type="submit"
                                                 disabled={isSelfUpdating}
-                                                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-indigo-100 disabled:opacity-50"
+                                                className="flex-1 py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50 disabled:opacity-50"
                                             >
                                                 {isSelfUpdating ? 'Saving...' : 'Save Profile'}
                                             </button>
@@ -943,7 +943,7 @@ const EmployeeDashboard = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setIsEditingSelf(true)}
-                                                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-indigo-100 text-center"
+                                                className="w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50 text-center"
                                             >
                                                 Edit Profile Info
                                             </button>
@@ -962,7 +962,7 @@ const EmployeeDashboard = () => {
                                         <button
                                             type="button"
                                             onClick={() => setShowProfileModal(false)}
-                                            className="w-full py-3 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-indigo-100/30 border-0 cursor-pointer"
+                                            className="w-full py-3 bg-[#154c46] hover:bg-teal-500 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-teal-50/30 border-0 cursor-pointer"
                                         >
                                             Close Details
                                         </button>
@@ -976,12 +976,12 @@ const EmployeeDashboard = () => {
 
             {/* Premium QR Check-In Modal */}
             {qrModal.isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#154c46]/60 backdrop-blur-md animate-in fade-in duration-300">
                     <div className="bg-white/95 rounded-3xl border border-slate-100 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300 relative">
                         {/* Header color based on type */}
                         <div className={`p-6 text-white relative text-center flex flex-col items-center justify-center ${
                             qrModal.type === 'success' ? 'bg-gradient-to-r from-emerald-500 to-teal-600' :
-                            qrModal.type === 'already_marked' ? 'bg-gradient-to-r from-purple-500 to-indigo-600' :
+                            qrModal.type === 'already_marked' ? 'bg-gradient-to-r from-purple-500 to-teal-500' :
                             'bg-gradient-to-r from-rose-500 to-pink-600'
                         }`}>
                             <div className="absolute top-4 right-4">
@@ -1020,7 +1020,7 @@ const EmployeeDashboard = () => {
                                 onClick={() => setQrModal({ ...qrModal, isOpen: false })}
                                 className={`w-full py-3.5 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg border-0 cursor-pointer ${
                                     qrModal.type === 'success' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100' :
-                                    qrModal.type === 'already_marked' ? 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100' :
+                                    qrModal.type === 'already_marked' ? 'bg-teal-500 hover:bg-teal-600 shadow-teal-50' :
                                     'bg-rose-600 hover:bg-rose-700 shadow-rose-100'
                                 }`}
                             >

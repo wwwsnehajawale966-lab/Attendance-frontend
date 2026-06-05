@@ -9,7 +9,7 @@ const EmployeeHistory = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/attendance/history', {
+                const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/attendance/history', {
                     headers: { 'x-auth-token': token }
                 });
                 const data = await res.json();
@@ -34,7 +34,7 @@ const EmployeeHistory = () => {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             <div>
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Attendance History</h1>
+                <h1 className="text-2xl font-bold text-[#1b5d55] tracking-tight">Attendance History</h1>
                 <p className="text-slate-500 text-sm font-medium mt-1">Your recent activity logs.</p>
             </div>
 
@@ -62,7 +62,7 @@ const EmployeeHistory = () => {
                                     <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                                <div className="p-2 bg-teal-50 text-teal-500 rounded-lg group-hover:bg-teal-500 group-hover:text-white transition-colors">
                                                     <Calendar size={16} />
                                                 </div>
                                                 <span className="text-sm font-bold text-slate-700">

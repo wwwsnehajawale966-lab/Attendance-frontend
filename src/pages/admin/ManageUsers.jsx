@@ -104,7 +104,7 @@ const AnalyticsChart = ({ logs }) => {
         <div className="glass-card bg-white border-slate-100 p-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h4 className="text-sm font-bold text-slate-800">Attendance & Productivity Analysis</h4>
+                    <h4 className="text-sm font-bold text-[#1b5d55]">Attendance & Productivity Analysis</h4>
                     <p className="text-slate-500 text-xs">Daily hours worked vs cumulative attendance trend</p>
                 </div>
                 {/* Legend */}
@@ -291,7 +291,7 @@ const ManageUsers = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/employees', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/admin/employees', {
                 headers: { 'x-auth-token': token }
             });
             const data = await res.json();
@@ -310,7 +310,7 @@ const ManageUsers = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this employee?')) return;
         try {
-            await fetch(`http://localhost:5000/api/admin/employee/${id}`, {
+            await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/employee/${id}`, {
                 method: 'DELETE',
                 headers: { 'x-auth-token': token }
             });
@@ -323,7 +323,7 @@ const ManageUsers = () => {
     const fetchAnalytics = async (employeeId, startStr = '', endStr = '') => {
         setAnalyticsLoading(true);
         try {
-            let url = `http://localhost:5000/api/admin/employee/${employeeId}/analytics`;
+            let url = `https://attendance-backend-0jxv.onrender.com/api/admin/employee/${employeeId}/analytics`;
             const params = new URLSearchParams();
             if (startStr) params.append('startDate', startStr);
             if (endStr) params.append('endDate', endStr);
@@ -360,8 +360,57 @@ const ManageUsers = () => {
         setSelectedEmployee(employee);
         setAnalyticsData(null);
         setDateRange({ startDate: '', endDate: '' });
-        fetchAnalytics(employee.id);
+        if (employee.status !== 'pending') {
+            fetchAnalytics(employee.id);
+        }
         setAnalyticsOpen(true);
+    };
+
+    const handleApprove = async (userId) => {
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/approve-employee/${userId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token 
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || 'Employee approved successfully!');
+                setAnalyticsOpen(false);
+                fetchUsers();
+            } else {
+                alert(data.message || 'Failed to approve employee');
+            }
+        } catch (err) {
+            console.error('Error approving employee:', err);
+        }
+    };
+
+    const handleReject = async (userId) => {
+        if (!window.confirm('Are you sure you want to reject this employee registration request? This will delete the pending account.')) {
+            return;
+        }
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/reject-employee/${userId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token 
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || 'Request rejected and deleted.');
+                setAnalyticsOpen(false);
+                fetchUsers();
+            } else {
+                alert(data.message || 'Failed to reject employee');
+            }
+        } catch (err) {
+            console.error('Error rejecting employee:', err);
+        }
     };
 
     const handleApplyFilters = () => {
@@ -389,7 +438,7 @@ const ManageUsers = () => {
         setIsUpdating(true);
         setUpdateError('');
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/employee/${editEmployeeData.id}`, {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/employee/${editEmployeeData.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -489,24 +538,24 @@ const ManageUsers = () => {
 
     const renderExtraWorkBadge = (extra) => {
         if (!extra || extra === 'N/A') return <span className="text-slate-400">N/A</span>;
-        return <span className="text-indigo-600 font-bold">{extra}</span>;
+        return <span className="text-teal-500 font-bold">{extra}</span>;
     };
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Manage Employees</h1>
+                    <h1 className="text-2xl font-bold text-[#1b5d55] tracking-tight">Manage Employees</h1>
                     <p className="text-slate-500 text-sm font-medium mt-1">Total {users.length} registered employees.</p>
                 </div>
                 <div className="relative group min-w-[300px]">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                     <input
                         type="text"
                         placeholder="Search by name or ID..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-white text-sm"
+                        className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-white text-sm"
                     />
                 </div>
             </div>
@@ -519,6 +568,7 @@ const ManageUsers = () => {
                                 <th className="px-6 py-4">Employee</th>
                                 <th className="px-6 py-4">Role</th>
                                 <th className="px-6 py-4">Department</th>
+                                <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -532,12 +582,12 @@ const ManageUsers = () => {
                                     <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold overflow-hidden border border-indigo-100">
+                                                <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-500 font-bold overflow-hidden border border-teal-50">
                                                     <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} alt="avatar" />
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-bold text-slate-900">{user.name}</div>
-                                                    <div className="text-[11px] font-black text-indigo-600 tracking-wider uppercase">{user.employee_id}</div>
+                                                    <div className="text-sm font-bold text-[#154c46]">{user.name}</div>
+                                                    <div className="text-[11px] font-black text-teal-500 tracking-wider uppercase">{user.employee_id}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -549,17 +599,22 @@ const ManageUsers = () => {
                                         <td className="px-6 py-4">
                                             <span className="text-xs font-bold text-slate-500 uppercase">{user.department || 'General'}</span>
                                         </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${user.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                                                {user.status || 'Approved'}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-3">
                                                 <button
                                                     onClick={() => handleViewMore(user)}
-                                                    className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded-xl text-xs font-bold tracking-wider transition-all duration-300 border-0 cursor-pointer text-center shadow-sm"
+                                                    className="px-3.5 py-2 bg-teal-50 hover:bg-teal-500 text-teal-500 hover:text-white rounded-xl text-xs font-bold tracking-wider transition-all duration-300 border-0 cursor-pointer text-center shadow-sm"
                                                 >
                                                     View More
                                                 </button>
                                                 <button 
                                                     onClick={() => handleEditClick(user)}
-                                                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg border border-transparent hover:border-slate-100 transition-all cursor-pointer"
+                                                    className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white rounded-lg border border-transparent hover:border-slate-100 transition-all cursor-pointer"
                                                 >
                                                     <Edit size={16} />
                                                 </button>
@@ -585,16 +640,16 @@ const ManageUsers = () => {
 
             {/* Detailed Attendance Analytics Modal */}
             {isAnalyticsOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
+                <div className="fixed inset-0 bg-[#154c46]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full border border-slate-100 overflow-hidden transform transition-all duration-300 animate-in zoom-in-95 my-8 flex flex-col max-h-[90vh]">
                         {/* Modal Header */}
                         <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold overflow-hidden border border-indigo-100">
+                                <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-teal-500 font-bold overflow-hidden border border-teal-50">
                                     <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedEmployee?.name}`} alt="avatar" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-black text-slate-800 uppercase tracking-wider leading-none mb-1.5">{selectedEmployee?.name}</h3>
+                                    <h3 className="text-base font-black text-[#1b5d55] uppercase tracking-wider leading-none mb-1.5">{selectedEmployee?.name}</h3>
                                     <p className="text-slate-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-2 flex-wrap">
                                         <span>ID: {selectedEmployee?.employee_id || 'N/A'}</span>
                                         <span className="text-slate-300">•</span>
@@ -616,6 +671,30 @@ const ManageUsers = () => {
 
                         {/* Modal Scrollable Container */}
                         <div className="p-8 overflow-y-auto space-y-6 flex-1">
+                            {selectedEmployee?.status === 'pending' ? (
+                                <div className="text-center py-10 space-y-6">
+                                    <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <AlertCircle size={40} />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-[#1b5d55]">Account Pending Approval</h4>
+                                    <p className="text-slate-500 text-sm max-w-md mx-auto">This employee has requested an account. Approve to generate their Employee ID and grant access, or reject to remove their request.</p>
+                                    <div className="flex items-center justify-center gap-4 pt-4">
+                                        <button 
+                                            onClick={() => handleReject(selectedEmployee.id)}
+                                            className="px-6 py-3 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-xl text-sm font-bold transition-all border-0 cursor-pointer"
+                                        >
+                                            Reject Request
+                                        </button>
+                                        <button 
+                                            onClick={() => handleApprove(selectedEmployee.id)}
+                                            className="px-6 py-3 bg-teal-500 text-white hover:bg-teal-600 rounded-xl text-sm font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50"
+                                        >
+                                            Approve Employee
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
                             {/* Date Filter & PDF Button */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-50/60 rounded-2xl border border-slate-100">
                                 <div className="flex flex-wrap items-center gap-3">
@@ -627,20 +706,20 @@ const ManageUsers = () => {
                                             type="date"
                                             value={dateRange.startDate}
                                             onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                                            className="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-xl outline-none focus:border-indigo-500"
+                                            className="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-xl outline-none focus:border-teal-400"
                                         />
                                         <span className="text-slate-400 text-xs font-bold">to</span>
                                         <input
                                             type="date"
                                             value={dateRange.endDate}
                                             onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                                            className="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-xl outline-none focus:border-indigo-500"
+                                            className="text-xs font-bold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-xl outline-none focus:border-teal-400"
                                         />
                                     </div>
                                     <button
                                         onClick={handleApplyFilters}
                                         disabled={analyticsLoading}
-                                        className="px-4 py-2 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border-0"
+                                        className="px-4 py-2 bg-[#154c46] hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer border-0"
                                     >
                                         <Filter size={14} />
                                         Apply Filters
@@ -650,7 +729,7 @@ const ManageUsers = () => {
                                     <button 
                                         onClick={exportAnalyticsCSV}
                                         disabled={!analyticsData || analyticsLoading}
-                                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 border-0 cursor-pointer shadow-md shadow-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 border-0 cursor-pointer shadow-md shadow-teal-50 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <FileText size={14} />
                                         Export CSV Report
@@ -668,14 +747,14 @@ const ManageUsers = () => {
                             ) : analyticsData ? (
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                                     {[
-                                        { title: 'Present Days', value: analyticsData.summary.totalPresent, color: 'text-blue-900', bg: 'bg-blue-50/70' },
-                                        { title: 'Absent Days', value: analyticsData.summary.totalAbsent, color: 'text-blue-900', bg: 'bg-blue-50/70' },
-                                        { title: 'Late Days', value: analyticsData.summary.totalLate, color: 'text-blue-900', bg: 'bg-blue-50/70' },
-                                        { title: 'Total Hours', value: analyticsData.summary.totalWorkingHours, color: 'text-blue-900', bg: 'bg-blue-50/70' },
-                                        { title: 'Extra Hours', value: analyticsData.summary.extraWorkingHours, color: 'text-blue-900', bg: 'bg-blue-50/70' },
-                                        { title: 'Average Hours', value: analyticsData.summary.averageWorkingHours, color: 'text-blue-900', bg: 'bg-blue-50/70' },
+                                        { title: 'Present Days', value: analyticsData.summary.totalPresent, color: 'text-blue-900', bg: 'bg-teal-50/70' },
+                                        { title: 'Absent Days', value: analyticsData.summary.totalAbsent, color: 'text-blue-900', bg: 'bg-teal-50/70' },
+                                        { title: 'Late Days', value: analyticsData.summary.totalLate, color: 'text-blue-900', bg: 'bg-teal-50/70' },
+                                        { title: 'Total Hours', value: analyticsData.summary.totalWorkingHours, color: 'text-blue-900', bg: 'bg-teal-50/70' },
+                                        { title: 'Extra Hours', value: analyticsData.summary.extraWorkingHours, color: 'text-blue-900', bg: 'bg-teal-50/70' },
+                                        { title: 'Average Hours', value: analyticsData.summary.averageWorkingHours, color: 'text-blue-900', bg: 'bg-teal-50/70' },
                                     ].map((stat, i) => (
-                                        <div key={i} className="glass-card p-4 border-slate-100 flex flex-col justify-between bg-white hover:border-blue-200 hover:bg-blue-50/20 transition-all duration-300">
+                                        <div key={i} className="glass-card p-4 border-slate-100 flex flex-col justify-between bg-white hover:border-teal-200 hover:bg-teal-50/20 transition-all duration-300">
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">{stat.title}</span>
                                             <div className="flex items-end justify-between">
                                                 <span className={`text-base font-black ${stat.color} tracking-tight leading-none`}>{stat.value}</span>
@@ -698,7 +777,7 @@ const ManageUsers = () => {
                             {/* Detailed Attendance Table */}
                             <div className="glass-card bg-white border-slate-100 overflow-hidden">
                                 <div className="px-6 py-4 border-b border-slate-50 flex items-center justify-between">
-                                    <h4 className="text-sm font-bold text-slate-800">Attendance Log History</h4>
+                                    <h4 className="text-sm font-bold text-[#1b5d55]">Attendance Log History</h4>
                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Mon - Fri working days</span>
                                 </div>
                                 <div className="overflow-x-auto">
@@ -725,7 +804,7 @@ const ManageUsers = () => {
                                             ) : analyticsData && analyticsData.logs.length > 0 ? (
                                                 analyticsData.logs.map((item, idx) => (
                                                     <tr key={idx} className="hover:bg-slate-50/50 transition-colors group">
-                                                        <td className="px-6 py-4 text-xs font-bold text-slate-900">
+                                                        <td className="px-6 py-4 text-xs font-bold text-[#154c46]">
                                                             {new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                                         </td>
                                                         <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wide">
@@ -740,7 +819,7 @@ const ManageUsers = () => {
                                                         </td>
                                                         <td className="px-6 py-4 text-xs font-bold text-slate-600">
                                                             {item.check_out ? (
-                                                                <span className="inline-flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg text-[9px] uppercase font-black">
+                                                                <span className="inline-flex items-center gap-1 text-teal-500 bg-teal-50 px-2 py-0.5 rounded-lg text-[9px] uppercase font-black">
                                                                     {new Date(item.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                                 </span>
                                                             ) : '--'}
@@ -753,7 +832,7 @@ const ManageUsers = () => {
                                                                 item.status === 'Present' ? 'bg-emerald-50 text-emerald-600' :
                                                                 item.status === 'Late' ? 'bg-amber-50 text-amber-600' :
                                                                 item.status === 'Absent' ? 'bg-rose-50 text-rose-600' :
-                                                                item.status === 'Leave' ? 'bg-blue-50 text-blue-600' :
+                                                                item.status === 'Leave' ? 'bg-teal-50 text-teal-500' :
                                                                 item.status === 'Holiday' ? 'bg-purple-50 text-purple-600' :
                                                                 'bg-slate-100 text-slate-500'
                                                             }`}>
@@ -781,7 +860,7 @@ const ManageUsers = () => {
                                                                     href={`https://maps.google.com/?q=${item.latitude},${item.longitude}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 border-0 cursor-pointer text-center"
+                                                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 hover:bg-teal-500 text-teal-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 border-0 cursor-pointer text-center"
                                                                 >
                                                                     <MapPin size={10} />
                                                                     View Map
@@ -801,6 +880,8 @@ const ManageUsers = () => {
                                     </table>
                                 </div>
                             </div>
+                                </>
+                            )}
                         </div>
 
                         {/* Modal Footer */}
@@ -818,12 +899,12 @@ const ManageUsers = () => {
 
             {/* Edit Employee Modal */}
             {isEditOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
+                <div className="fixed inset-0 bg-[#154c46]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-100 overflow-hidden transform transition-all duration-300 animate-in zoom-in-95 my-8 flex flex-col">
                         {/* Modal Header */}
                         <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
                             <div>
-                                <h3 className="text-base font-black text-slate-800 uppercase tracking-wider leading-none">Edit Employee</h3>
+                                <h3 className="text-base font-black text-[#1b5d55] uppercase tracking-wider leading-none">Edit Employee</h3>
                                 <p className="text-slate-400 text-[10px] font-black uppercase tracking-wider mt-1.5">Modify account information</p>
                             </div>
                             <button 
@@ -852,7 +933,7 @@ const ManageUsers = () => {
                                         required
                                         value={editEmployeeData.name}
                                         onChange={(e) => setEditEmployeeData({ ...editEmployeeData, name: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-xs font-semibold"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all text-xs font-semibold"
                                     />
                                 </div>
 
@@ -864,7 +945,7 @@ const ManageUsers = () => {
                                         required
                                         value={editEmployeeData.email}
                                         onChange={(e) => setEditEmployeeData({ ...editEmployeeData, email: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-xs font-semibold"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all text-xs font-semibold"
                                     />
                                 </div>
 
@@ -875,7 +956,7 @@ const ManageUsers = () => {
                                         type="text"
                                         value={editEmployeeData.phone}
                                         onChange={(e) => setEditEmployeeData({ ...editEmployeeData, phone: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-xs font-semibold"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all text-xs font-semibold"
                                         placeholder="e.g. +91 9876543210"
                                     />
                                 </div>
@@ -886,7 +967,7 @@ const ManageUsers = () => {
                                     <select
                                         value={editEmployeeData.gender}
                                         onChange={(e) => setEditEmployeeData({ ...editEmployeeData, gender: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-xs font-semibold text-slate-700 bg-white"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all text-xs font-semibold text-slate-700 bg-white"
                                     >
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
@@ -901,7 +982,7 @@ const ManageUsers = () => {
                                     <select
                                         value={editEmployeeData.department}
                                         onChange={(e) => setEditEmployeeData({ ...editEmployeeData, department: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-xs font-semibold text-slate-700 bg-white"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all text-xs font-semibold text-slate-700 bg-white"
                                     >
                                         <option value="">Select Department</option>
                                         <option value="IT">IT Department</option>
@@ -917,7 +998,7 @@ const ManageUsers = () => {
                                     <select
                                         value={editEmployeeData.role}
                                         onChange={(e) => setEditEmployeeData({ ...editEmployeeData, role: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all text-xs font-semibold text-slate-700 bg-white"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all text-xs font-semibold text-slate-700 bg-white"
                                     >
                                         <option value="employee">Employee</option>
                                         <option value="admin">Administrator</option>
@@ -937,7 +1018,7 @@ const ManageUsers = () => {
                                 <button
                                     type="submit"
                                     disabled={isUpdating}
-                                    className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-indigo-100 disabled:opacity-50"
+                                    className="px-5 py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50 disabled:opacity-50"
                                 >
                                     {isUpdating ? 'Saving...' : 'Save Changes'}
                                 </button>

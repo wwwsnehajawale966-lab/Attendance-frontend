@@ -34,7 +34,7 @@ const Login = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/reset-password', {
+            const response = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/reset-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -102,16 +102,16 @@ const Login = () => {
         <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] p-6 relative overflow-hidden font-sans">
             {/* Decorative Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
-                <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-60"></div>
+                <div className="absolute -top-24 -left-24 w-96 h-96 bg-teal-50 rounded-full blur-3xl opacity-60"></div>
+                <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-teal-50 rounded-full blur-3xl opacity-60"></div>
             </div>
 
             <div className="w-full max-w-[440px] glass-card p-10 z-10 transition-all duration-300">
                 <div className="text-center mb-10">
-                    <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-indigo-100 ring-4 ring-indigo-50">
+                    <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-teal-50 ring-4 ring-teal-50">
                         <ShieldCheck size={28} />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Portal Access</h1>
+                    <h1 className="text-2xl font-bold text-[#154c46] tracking-tight">Portal Access</h1>
                     <p className="text-slate-500 mt-2 text-sm font-medium">Verify your credentials to continue</p>
                 </div>
 
@@ -126,13 +126,13 @@ const Login = () => {
                     <div className="space-y-2">
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
                         <div className="relative group">
-                            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="name@company.com"
-                                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm"
+                                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm"
                                 required
                             />
                         </div>
@@ -141,13 +141,13 @@ const Login = () => {
                     <div className="space-y-2">
                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
                         <div className="relative group">
-                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm"
+                                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm"
                                 required
                             />
                         </div>
@@ -155,8 +155,8 @@ const Login = () => {
 
                     <div className="flex items-center justify-between px-1">
                         <label className="flex items-center group cursor-pointer">
-                            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition-all" />
-                            <span className="ml-2 text-xs font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Keep me signed in</span>
+                            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-teal-500 focus:ring-teal-400 transition-all" />
+                            <span className="ml-2 text-xs font-medium text-slate-600 group-hover:text-[#154c46] transition-colors">Keep me signed in</span>
                         </label>
                         <button
                             type="button"
@@ -165,7 +165,7 @@ const Login = () => {
                                 setResetError('');
                                 setResetSuccess('');
                             }}
-                            className="text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline transition-all bg-transparent border-0 cursor-pointer focus:outline-none"
+                            className="text-xs font-bold text-teal-500 hover:text-teal-600 hover:underline transition-all bg-transparent border-0 cursor-pointer focus:outline-none"
                         >
                             Reset Password
                         </button>
@@ -174,7 +174,7 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="btn-primary w-full py-3.5 shadow-indigo-200/50 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="btn-primary w-full py-3.5 shadow-teal-100/50 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {isLoading ? (
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -187,24 +187,30 @@ const Login = () => {
                     </button>
                 </form>
 
-                <div className="mt-10 pt-8 border-t border-slate-100 text-center">
+                <div className="mt-10 pt-8 border-t border-slate-100 flex flex-col items-center gap-2">
                     <p className="text-slate-400 text-xs font-medium">
                         Authorized Personnel Only
+                    </p>
+                    <p className="text-xs font-bold text-slate-500">
+                        New Employee?{' '}
+                        <Link to="/register" className="text-teal-500 hover:text-teal-600 hover:underline transition-all">
+                            Request Account
+                        </Link>
                     </p>
                 </div>
             </div>
 
             {/* Reset Password Modal */}
             {isResetModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300 font-sans">
+                <div className="fixed inset-0 bg-[#154c46]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300 font-sans">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full border border-slate-100 overflow-hidden transform transition-all duration-300 animate-in zoom-in-95">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                             <div className="flex items-center gap-3">
-                                <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl font-bold">
+                                <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl font-bold">
                                     <ShieldCheck size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Reset Password</h3>
+                                    <h3 className="text-sm font-black text-[#1b5d55] uppercase tracking-wider">Reset Password</h3>
                                     <p className="text-slate-500 text-[10px] font-bold">Verify identity to set a new password.</p>
                                 </div>
                             </div>
@@ -243,7 +249,7 @@ const Login = () => {
                                         value={resetForm.email}
                                         onChange={(e) => setResetForm({ ...resetForm, email: e.target.value })}
                                         placeholder="name@company.com"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
                                         required
                                     />
                                 </div>
@@ -255,7 +261,7 @@ const Login = () => {
                                         value={resetForm.employeeId}
                                         onChange={(e) => setResetForm({ ...resetForm, employeeId: e.target.value })}
                                         placeholder="EMP-2026-001"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
                                         required
                                     />
                                 </div>
@@ -267,7 +273,7 @@ const Login = () => {
                                         value={resetForm.newPassword}
                                         onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
                                         placeholder="••••••••"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
                                         required
                                     />
                                 </div>
@@ -279,7 +285,7 @@ const Login = () => {
                                         value={resetForm.confirmPassword}
                                         onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
                                         placeholder="••••••••"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-300"
                                         required
                                     />
                                 </div>
@@ -300,7 +306,7 @@ const Login = () => {
                                 <button
                                     type="submit"
                                     disabled={resetLoading}
-                                    className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-indigo-600 font-bold text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-75 cursor-pointer border-0"
+                                    className="flex-1 py-2.5 bg-[#154c46] text-white rounded-xl hover:bg-teal-500 font-bold text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-75 cursor-pointer border-0"
                                 >
                                     {resetLoading ? (
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

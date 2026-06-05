@@ -29,7 +29,7 @@ const AddEmployee = () => {
         const token = localStorage.getItem('token');
 
         try {
-            const response = await fetch('http://localhost:5000/api/admin/add-employee', {
+            const response = await fetch('https://attendance-backend-0jxv.onrender.com/api/admin/add-employee', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const AddEmployee = () => {
                     <ArrowLeft size={20} />
                 </button>
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Add New Employee</h1>
+                    <h1 className="text-2xl font-bold text-[#1b5d55] tracking-tight">Add New Employee</h1>
                     <p className="text-slate-500 text-sm font-medium">Create a new account for local personnel.</p>
                 </div>
             </div>
@@ -91,14 +91,14 @@ const AddEmployee = () => {
                         <div className="space-y-2">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
                             <div className="relative group">
-                                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                                 <input
                                     name="name"
                                     value={name}
                                     onChange={onChange}
                                     type="text"
                                     placeholder="John Doe"
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm"
                                     required
                                 />
                             </div>
@@ -107,14 +107,14 @@ const AddEmployee = () => {
                         <div className="space-y-2">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
                             <div className="relative group">
-                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                                 <input
                                     name="email"
                                     value={email}
                                     onChange={onChange}
                                     type="email"
                                     placeholder="john@company.com"
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm"
                                     required
                                 />
                             </div>
@@ -123,14 +123,14 @@ const AddEmployee = () => {
                         <div className="space-y-2">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Phone Number</label>
                             <div className="relative group">
-                                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                                 <input
                                     name="phone"
                                     value={phone}
                                     onChange={onChange}
                                     type="text"
                                     placeholder="e.g. +91 9876543210"
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm"
                                 />
                             </div>
                         </div>
@@ -138,12 +138,12 @@ const AddEmployee = () => {
                         <div className="space-y-2">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Gender</label>
                             <div className="relative group">
-                                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                                 <select
                                     name="gender"
                                     value={gender}
                                     onChange={onChange}
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm font-medium text-slate-700 appearance-none"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm font-medium text-slate-700 appearance-none"
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
@@ -156,12 +156,12 @@ const AddEmployee = () => {
                         <div className="space-y-2">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Department</label>
                             <div className="relative group">
-                                <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                                 <select
                                     name="department"
                                     value={department}
                                     onChange={onChange}
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm font-medium text-slate-700 appearance-none"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm font-medium text-slate-700 appearance-none"
                                 >
                                     <option value="">Select Department</option>
                                     <option value="IT">IT Department</option>
@@ -175,14 +175,14 @@ const AddEmployee = () => {
                         <div className="space-y-2">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
                             <div className="relative group">
-                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                                 <input
                                     name="password"
                                     value={password}
                                     onChange={onChange}
                                     type="password"
                                     placeholder="••••••••"
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm"
                                     required
                                 />
                             </div>
@@ -191,12 +191,12 @@ const AddEmployee = () => {
                         <div className="space-y-2">
                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Role</label>
                             <div className="relative group">
-                                <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={18} />
                                 <select
                                     name="role"
                                     value={role}
                                     onChange={onChange}
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-sm font-medium text-slate-700 appearance-none"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-sm font-medium text-slate-700 appearance-none"
                                 >
                                     <option value="employee">Employee</option>
                                     <option value="admin">Administrator</option>
@@ -209,7 +209,7 @@ const AddEmployee = () => {
                         <button
                             type="submit"
                             disabled={isLoading || success}
-                            className="btn-primary w-full py-3.5 shadow-indigo-200/50 disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="btn-primary w-full py-3.5 shadow-teal-100/50 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {isLoading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>

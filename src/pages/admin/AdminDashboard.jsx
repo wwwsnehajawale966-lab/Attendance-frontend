@@ -31,7 +31,7 @@ const AdminDashboard = () => {
         setLoadingQr(true);
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:5000/api/attendance/qr-token', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/attendance/qr-token', {
                 headers: { 'x-auth-token': token }
             });
             if (res.ok) {
@@ -88,7 +88,7 @@ const AdminDashboard = () => {
             const todayStr = `${y}-${m}-${d}`;
 
             // Fetch Today's Reports
-            const res = await fetch(`http://localhost:5000/api/admin/report?startDate=${todayStr}&endDate=${todayStr}`, {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/report?startDate=${todayStr}&endDate=${todayStr}`, {
                 headers: { 'x-auth-token': token }
             });
             
@@ -205,7 +205,7 @@ const AdminDashboard = () => {
             const d = String(now.getDate()).padStart(2, '0');
             const todayStr = `${y}-${m}-${d}`;
 
-            const res = await fetch(`http://localhost:5000/api/admin/report?startDate=${todayStr}&endDate=${todayStr}`, {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/report?startDate=${todayStr}&endDate=${todayStr}`, {
                 headers: { 'x-auth-token': token }
             });
             const data = await res.json();
@@ -241,13 +241,13 @@ const AdminDashboard = () => {
             const todayStr = `${y}-${m}-${d}`;
 
             // Fetch All Employees
-            const empRes = await fetch('http://localhost:5000/api/admin/employees', {
+            const empRes = await fetch('https://attendance-backend-0jxv.onrender.com/api/admin/employees', {
                 headers: { 'x-auth-token': token }
             });
             const allEmployees = await empRes.json();
 
             // Fetch Today's Attendance Logs
-            const reportRes = await fetch(`http://localhost:5000/api/admin/report?startDate=${todayStr}&endDate=${todayStr}`, {
+            const reportRes = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/report?startDate=${todayStr}&endDate=${todayStr}`, {
                 headers: { 'x-auth-token': token }
             });
             const todayReports = await reportRes.json();
@@ -290,6 +290,81 @@ const AdminDashboard = () => {
     const [settingsSaving, setSettingsSaving] = React.useState(false);
     const [settingsSuccess, setSettingsSuccess] = React.useState(false);
 
+    // Pending Account Requests States & Methods
+    const [pendingRequests, setPendingRequests] = React.useState([]);
+    const [loadingPending, setLoadingPending] = React.useState(false);
+
+    const fetchPendingRequests = async () => {
+        setLoadingPending(true);
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/admin/pending-approvals', {
+                headers: { 'x-auth-token': token }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setPendingRequests(data);
+            }
+        } catch (err) {
+            console.error('Error fetching pending approvals:', err);
+        } finally {
+            setLoadingPending(false);
+        }
+    };
+
+    const handleApprove = async (userId) => {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/approve-employee/${userId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token 
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || 'Employee approved successfully!');
+                fetchPendingRequests();
+                // Also update stats since total employees count changes
+                const statsRes = await fetch('https://attendance-backend-0jxv.onrender.com/api/admin/stats', {
+                    headers: { 'x-auth-token': token }
+                });
+                const statsJson = await statsRes.json();
+                setStatsData(statsJson);
+            } else {
+                alert(data.message || 'Failed to approve employee');
+            }
+        } catch (err) {
+            console.error('Error approving employee:', err);
+        }
+    };
+
+    const handleReject = async (userId) => {
+        if (!window.confirm('Are you sure you want to reject this employee registration request? This will delete the pending account.')) {
+            return;
+        }
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/reject-employee/${userId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token 
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || 'Request rejected and deleted.');
+                fetchPendingRequests();
+            } else {
+                alert(data.message || 'Failed to reject employee');
+            }
+        } catch (err) {
+            console.error('Error rejecting employee:', err);
+        }
+    };
+
     const handleSettingsSave = (e) => {
         e.preventDefault();
         setSettingsSaving(true);
@@ -309,12 +384,15 @@ const AdminDashboard = () => {
             const token = localStorage.getItem('token');
             try {
                 // Fetch Stats
-                const statsRes = await fetch('http://localhost:5000/api/admin/stats', {
+                const statsRes = await fetch('https://attendance-backend-0jxv.onrender.com/api/admin/stats', {
                     headers: { 'x-auth-token': token }
                 });
                 const statsJson = await statsRes.json();
 
                 setStatsData(statsJson);
+                
+                // Fetch pending registration requests
+                await fetchPendingRequests();
             } catch (err) {
                 console.error('Error fetching dashboard data:', err);
             } finally {
@@ -332,8 +410,8 @@ const AdminDashboard = () => {
             change: '+12%',
             isPositive: true,
             icon: Users,
-            color: 'text-blue-600',
-            bg: 'bg-blue-50'
+            color: 'text-teal-500',
+            bg: 'bg-teal-50'
         },
         {
             title: 'Today Present',
@@ -369,7 +447,7 @@ const AdminDashboard = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">System Overview</h1>
+                    <h1 className="text-2xl font-bold text-[#1b5d55] tracking-tight">System Overview</h1>
                     <p className="text-slate-500 text-sm font-medium mt-1">Good morning, Admin. Here's what's happening today.</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -403,7 +481,7 @@ const AdminDashboard = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, index) => (
-                    <div key={index} className="glass-card p-6 border-slate-100 hover:border-indigo-100 transition-all duration-300 group cursor-pointer hover:shadow-xl hover:shadow-indigo-50/50">
+                    <div key={index} className="glass-card p-6 border-slate-100 hover:border-teal-50 transition-all duration-300 group cursor-pointer hover:shadow-xl hover:shadow-teal-50/50">
                         {isLoading ? (
                             <div className="animate-pulse space-y-4">
                                 <div className="w-12 h-12 bg-slate-100 rounded-2xl"></div>
@@ -415,7 +493,7 @@ const AdminDashboard = () => {
                         ) : (
                             <>
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} transition-colors group-hover:bg-indigo-600 group-hover:text-white duration-300`}>
+                                    <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} transition-colors group-hover:bg-teal-500 group-hover:text-white duration-300`}>
                                         <stat.icon size={22} />
                                     </div>
                                     <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${stat.isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
@@ -425,7 +503,7 @@ const AdminDashboard = () => {
                                 </div>
                                 <div className="space-y-1">
                                     <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider">{stat.title}</h3>
-                                    <p className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</p>
+                                    <p className="text-3xl font-black text-[#154c46] tracking-tight">{stat.value}</p>
                                 </div>
                                 <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-[11px] font-medium text-slate-400">
                                     <span>View details</span>
@@ -437,18 +515,37 @@ const AdminDashboard = () => {
                 ))}
             </div>
 
+            {/* Pending Account Requests - Removed inline grid, now in dedicated page */}
+            {pendingRequests.length > 0 && (
+                <div className="glass-card p-6 border-rose-100 bg-rose-50/50 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md transition-all duration-300" onClick={() => navigate('/admin/users')}>
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center animate-pulse">
+                            <UserMinus size={24} />
+                        </div>
+                        <div className="text-left">
+                            <h3 className="text-base font-bold text-rose-800 tracking-tight">Pending Account Requests</h3>
+                            <p className="text-slate-500 text-xs font-semibold mt-0.5">You have {pendingRequests.length} employee request(s) waiting for approval.</p>
+                        </div>
+                    </div>
+                    <button className="px-4 py-2 bg-rose-600 text-white rounded-xl hover:bg-rose-700 font-bold text-xs transition-colors border-0 cursor-pointer flex items-center gap-2">
+                        Review Requests
+                        <ArrowUpRight size={14} />
+                    </button>
+                </div>
+            )}
+
             {/* Recent Activity & Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Colorful Analytics Graph & Insights (lg:col-span-2) */}
                 <div className="lg:col-span-2 glass-card p-8 border-slate-100 bg-white flex flex-col justify-between">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                         <div>
-                            <h3 className="text-lg font-bold text-slate-800">Attendance Analytics Trend</h3>
+                            <h3 className="text-lg font-bold text-[#1b5d55]">Attendance Analytics Trend</h3>
                             <p className="text-slate-500 text-xs font-medium">Daily presence percentage and pattern analysis for the last 7 days.</p>
                         </div>
                         <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400 shrink-0">
                             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-md bg-gradient-to-r from-emerald-400 to-teal-500"></div><span>Optimal (&gt;=80%)</span></div>
-                            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-md bg-gradient-to-r from-indigo-400 to-blue-500"></div><span>Moderate</span></div>
+                            <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-md bg-gradient-to-r from-teal-300 to-blue-500"></div><span>Moderate</span></div>
                             <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-md bg-gradient-to-r from-rose-400 to-pink-500"></div><span>Action Needed</span></div>
                         </div>
                     </div>
@@ -456,8 +553,8 @@ const AdminDashboard = () => {
                     {/* Colorful Graph */}
                     <div className="h-64 flex items-end justify-between gap-3 px-2 mb-8 bg-slate-50/50 border border-slate-100 rounded-3xl p-6 relative">
                         {(statsData.weeklyTrend || []).map((d, i) => {
-                            let barColorClass = "from-indigo-400 to-blue-500";
-                            let labelColor = "text-indigo-600 bg-indigo-50";
+                            let barColorClass = "from-teal-300 to-blue-500";
+                            let labelColor = "text-teal-500 bg-teal-50";
 
                             if (d.val >= 80) {
                                 barColorClass = "from-emerald-400 to-teal-500";
@@ -477,7 +574,7 @@ const AdminDashboard = () => {
                                             style={{ height: `${d.val}%` }}
                                             className={`w-full bg-gradient-to-t ${barColorClass} rounded-t-xl transition-all duration-1000 group-hover:brightness-110 relative z-10 shadow-md`}
                                         >
-                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded transition-opacity whitespace-nowrap z-20">
+                                            <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-[#154c46] text-white text-[10px] font-bold px-2 py-1 rounded transition-opacity whitespace-nowrap z-20">
                                                 {d.val}%
                                             </div>
                                             <div className="w-1.5 h-1.5 rounded-full bg-white absolute top-1.5 left-1/2 -translate-x-1/2 opacity-70"></div>
@@ -525,7 +622,7 @@ const AdminDashboard = () => {
                                 <div className="grid grid-cols-3 gap-4">
                                     <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left">
                                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block leading-none mb-1">Average Weekday</span>
-                                        <span className="text-xl font-black text-slate-800 leading-none">{avgAttendance}%</span>
+                                        <span className="text-xl font-black text-[#1b5d55] leading-none">{avgAttendance}%</span>
                                     </div>
                                     <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left">
                                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block leading-none mb-1">Peak Day</span>
@@ -552,14 +649,13 @@ const AdminDashboard = () => {
                 <div className="space-y-8 flex flex-col">
                     {/* Quick Actions Card */}
                     <div className="glass-card p-8 border-slate-100 h-fit">
-                        <h3 className="text-lg font-bold text-slate-800 mb-6">Quick Actions</h3>
+                        <h3 className="text-lg font-bold text-[#1b5d55] mb-6">Quick Actions</h3>
                         <div className="grid grid-cols-1 gap-4">
                             {[
                                 { label: "Today's Present", color: 'bg-emerald-50 text-emerald-600', path: 'present' },
-                                { label: 'Add User', color: 'bg-indigo-50 text-indigo-600', path: '/admin/add-employee' },
-                                { label: "Today's Leaves", color: 'bg-rose-50 text-rose-600', path: 'leaves' },
+                                { label: 'Review Requests', color: 'bg-rose-50 text-rose-600', path: '/admin/users' },
+                                { label: 'Add User', color: 'bg-teal-50 text-teal-500', path: '/admin/add-employee' },
                                 { label: 'Reports', color: 'bg-emerald-50 text-emerald-600', path: '/admin/attendance' },
-                                { label: 'Settings', color: 'bg-slate-50 text-slate-600', path: '/admin' },
                             ].map((action, i) => (
                                 <button
                                     key={i}
@@ -601,21 +697,21 @@ const AdminDashboard = () => {
 
                     {/* Dynamic QR Check-In Card */}
                     <div className="glass-card p-8 border-slate-100 h-fit bg-white flex flex-col items-center text-center">
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 ring-4 ring-indigo-50/50">
+                        <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-500 flex items-center justify-center mb-4 ring-4 ring-teal-50/50">
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-qr-code"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v-3"/><path d="M12 7v3"/><path d="M12 12v3"/><path d="M16 12h-4"/><path d="M21 12h-1"/><path d="M12 3h.01"/><path d="M12 16h.01"/><path d="M16 16h.01"/><path d="M16 7h.01"/><path d="M21 7h.01"/></svg>
                         </div>
-                        <h3 className="text-base font-bold text-slate-800 mb-1">Dynamic QR Check-In</h3>
+                        <h3 className="text-base font-bold text-[#1b5d55] mb-1">Dynamic QR Check-In</h3>
                         <p className="text-slate-400 text-xs font-semibold max-w-[220px] mb-6 font-sans">Scan this QR code with your phone camera or custom app to check in instantly.</p>
                         
                         {/* QR Code Wrapper with subtle glowing ring */}
-                        <div className="p-4 bg-white rounded-3xl border border-slate-100 shadow-md shadow-indigo-100/50 mb-6 hover:shadow-lg hover:shadow-indigo-100 transition-all duration-300 relative group overflow-hidden">
+                        <div className="p-4 bg-white rounded-3xl border border-slate-100 shadow-md shadow-teal-50/50 mb-6 hover:shadow-lg hover:shadow-teal-50 transition-all duration-300 relative group overflow-hidden">
                             {loadingQr && (
                                 <div className="absolute inset-0 bg-white/75 backdrop-blur-sm flex items-center justify-center z-10">
-                                    <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
                                 </div>
                             )}
                             <img 
-                                src={dynamicQr ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(dynamicQr.qrUrl)}` : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('http://localhost:5173/employee?qr=true')}`} 
+                                src={dynamicQr ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(dynamicQr.qrUrl)}` : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + '/employee?qr=true')}`} 
                                 alt="Attendance QR Code"
                                 className="w-48 h-48 block rounded-2xl select-none"
                             />
@@ -625,7 +721,7 @@ const AdminDashboard = () => {
                         <div className="w-full space-y-2 mb-6">
                             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
                                 <div 
-                                    className="bg-indigo-600 h-full transition-all duration-1000 ease-linear rounded-full" 
+                                    className="bg-teal-500 h-full transition-all duration-1000 ease-linear rounded-full" 
                                     style={{ width: `${progressPercent}%` }}
                                 />
                             </div>
@@ -635,7 +731,7 @@ const AdminDashboard = () => {
                                     type="button"
                                     onClick={fetchDynamicQrToken} 
                                     disabled={loadingQr}
-                                    className="text-indigo-600 hover:text-indigo-700 bg-transparent border-0 cursor-pointer font-black uppercase tracking-wider text-[10px]"
+                                    className="text-teal-500 hover:text-teal-600 bg-transparent border-0 cursor-pointer font-black uppercase tracking-wider text-[10px]"
                                 >
                                     Refresh
                                 </button>
@@ -659,15 +755,15 @@ const AdminDashboard = () => {
 
         {/* Settings Modal */}
             {isSettingsOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 bg-[#154c46]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full border border-slate-100 overflow-hidden transform transition-all duration-300 animate-in zoom-in-95">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl animate-pulse">
+                                <div className="p-2 bg-teal-50 text-teal-500 rounded-xl animate-pulse">
                                     <Settings size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">System Settings</h3>
+                                    <h3 className="text-sm font-black text-[#1b5d55] uppercase tracking-wider">System Settings</h3>
                                     <p className="text-slate-500 text-[10px] font-bold">Configure attendance guidelines.</p>
                                 </div>
                             </div>
@@ -691,12 +787,12 @@ const AdminDashboard = () => {
                                 <div className="space-y-1">
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Late Arrival Threshold</label>
                                     <div className="relative group">
-                                        <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
+                                        <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={16} />
                                         <input
                                             type="time"
                                             value={settingsForm.lateTime}
                                             onChange={(e) => setSettingsForm({ ...settingsForm, lateTime: e.target.value })}
-                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
+                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
                                             required
                                         />
                                     </div>
@@ -705,14 +801,14 @@ const AdminDashboard = () => {
                                 <div className="space-y-1">
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Minimum Daily Hours</label>
                                     <div className="relative group">
-                                        <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
+                                        <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={16} />
                                         <input
                                             type="number"
                                             min="1"
                                             max="24"
                                             value={settingsForm.workingHoursRequired}
                                             onChange={(e) => setSettingsForm({ ...settingsForm, workingHoursRequired: e.target.value })}
-                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
+                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
                                             required
                                         />
                                     </div>
@@ -720,14 +816,14 @@ const AdminDashboard = () => {
 
                                 <div className="pt-2 flex items-center justify-between">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-800">Auto Check-in on Login</label>
+                                        <label className="block text-xs font-bold text-[#1b5d55]">Auto Check-in on Login</label>
                                         <p className="text-slate-400 text-[10px]">Automatically mark presence upon logging in.</p>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setSettingsForm({ ...settingsForm, autoCheckIn: !settingsForm.autoCheckIn })}
                                         className={`w-11 h-6 rounded-full transition-all duration-300 relative focus:outline-none ${
-                                            settingsForm.autoCheckIn ? 'bg-indigo-600' : 'bg-slate-200'
+                                            settingsForm.autoCheckIn ? 'bg-teal-500' : 'bg-slate-200'
                                         }`}
                                     >
                                         <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-300 ${
@@ -739,14 +835,14 @@ const AdminDashboard = () => {
                                 <div className="border-t border-slate-50 pt-4 space-y-4">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-800">IP Restrict Check-In</label>
+                                            <label className="block text-xs font-bold text-[#1b5d55]">IP Restrict Check-In</label>
                                             <p className="text-slate-400 text-[10px]">Only allow check-in from company WiFi.</p>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => setSettingsForm({ ...settingsForm, ipRestriction: !settingsForm.ipRestriction })}
                                             className={`w-11 h-6 rounded-full transition-all duration-300 relative focus:outline-none ${
-                                                settingsForm.ipRestriction ? 'bg-indigo-600' : 'bg-slate-200'
+                                                settingsForm.ipRestriction ? 'bg-teal-500' : 'bg-slate-200'
                                             }`}
                                         >
                                             <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-300 ${
@@ -763,7 +859,7 @@ const AdminDashboard = () => {
                                                 value={settingsForm.allowedIp}
                                                 onChange={(e) => setSettingsForm({ ...settingsForm, allowedIp: e.target.value })}
                                                 placeholder="192.168.1.1"
-                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
+                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
                                             />
                                         </div>
                                     )}
@@ -781,7 +877,7 @@ const AdminDashboard = () => {
                                 <button
                                     type="submit"
                                     disabled={settingsSaving}
-                                    className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-indigo-600 font-bold text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-75"
+                                    className="flex-1 py-2.5 bg-[#154c46] text-white rounded-xl hover:bg-teal-500 font-bold text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-75"
                                 >
                                     {settingsSaving ? (
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -802,7 +898,7 @@ const AdminDashboard = () => {
 
             {/* Today's Present Employees Modal */}
             {showPresentModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 bg-[#154c46]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full border border-slate-100 overflow-hidden transform transition-all duration-300 animate-in zoom-in-95 flex flex-col max-h-[85vh]">
                         {/* Modal Header */}
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -811,7 +907,7 @@ const AdminDashboard = () => {
                                     <CalendarCheck size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Today's Present Employees</h3>
+                                    <h3 className="text-sm font-black text-[#1b5d55] uppercase tracking-wider">Today's Present Employees</h3>
                                     <p className="text-slate-500 text-[10px] font-bold">
                                         Showing {presentEmployees.filter(item => 
                                             (item.name || '').toLowerCase().includes(presentSearchQuery.toLowerCase()) ||
@@ -835,13 +931,13 @@ const AdminDashboard = () => {
                         {/* Search and Filters */}
                         <div className="p-4 border-b border-slate-50 bg-white">
                             <div className="relative group">
-                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={16} />
                                 <input
                                     type="text"
                                     placeholder="Search by name, department, or employee ID..."
                                     value={presentSearchQuery}
                                     onChange={(e) => setPresentSearchQuery(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-400"
+                                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-400"
                                 />
                                 {presentSearchQuery && (
                                     <button
@@ -867,15 +963,15 @@ const AdminDashboard = () => {
                                     return (
                                         <div className="space-y-3">
                                             {filtered.map((item, i) => (
-                                                <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:border-indigo-100 hover:bg-slate-50/50 transition-all duration-300">
+                                                <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:border-teal-50 hover:bg-slate-50/50 transition-all duration-300">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 shrink-0">
                                                             <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name}`} alt={item.name} />
                                                         </div>
                                                         <div>
-                                                            <h4 className="text-xs font-black text-slate-900 leading-none mb-1.5">{item.name}</h4>
+                                                            <h4 className="text-xs font-black text-[#154c46] leading-none mb-1.5">{item.name}</h4>
                                                             <div className="flex items-center gap-2 flex-wrap">
-                                                                <span className="text-[9px] text-indigo-600 font-black bg-indigo-50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">{item.employee_id || 'No ID'}</span>
+                                                                <span className="text-[9px] text-teal-500 font-black bg-teal-50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">{item.employee_id || 'No ID'}</span>
                                                                 <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{item.department || 'General'}</span>
                                                             </div>
                                                         </div>
@@ -885,7 +981,7 @@ const AdminDashboard = () => {
                                                         <div className="text-right">
                                                             <div className="flex items-center gap-1 justify-end mb-1">
                                                                 <Clock size={12} className="text-slate-400" />
-                                                                <span className="text-[11px] font-black text-slate-900 leading-none">
+                                                                <span className="text-[11px] font-black text-[#154c46] leading-none">
                                                                     {item.check_in ? new Date(item.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : '--:--'}
                                                                 </span>
                                                             </div>
@@ -904,7 +1000,7 @@ const AdminDashboard = () => {
                                                                     href={`https://maps.google.com/?q=${item.latitude},${item.longitude}`}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-100 transition-all duration-300 flex items-center justify-center hover:scale-105"
+                                                                    className="p-2.5 rounded-xl bg-teal-50 text-teal-500 hover:bg-teal-500 hover:text-white border border-teal-50 transition-all duration-300 flex items-center justify-center hover:scale-105"
                                                                     title="View Map Location"
                                                                 >
                                                                     <MapPin size={14} />
@@ -929,7 +1025,7 @@ const AdminDashboard = () => {
                                             <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
                                                 <Users size={28} />
                                             </div>
-                                            <h3 className="text-sm font-black text-slate-800 mb-1">No present employees found</h3>
+                                            <h3 className="text-sm font-black text-[#1b5d55] mb-1">No present employees found</h3>
                                             <p className="text-slate-400 text-xs font-medium max-w-sm mx-auto">
                                                 {presentSearchQuery 
                                                     ? `No match found for "${presentSearchQuery}". Try another search term.`
@@ -960,7 +1056,7 @@ const AdminDashboard = () => {
 
             {/* Today's Leaves / Absentees Modal */}
             {showLeavesModal && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 bg-[#154c46]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full border border-slate-100 overflow-hidden transform transition-all duration-300 animate-in zoom-in-95 flex flex-col max-h-[85vh]">
                         {/* Modal Header */}
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -969,7 +1065,7 @@ const AdminDashboard = () => {
                                     <Clock size={18} />
                                 </div>
                                 <div>
-                                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Today's Leaves / Absentees</h3>
+                                    <h3 className="text-sm font-black text-[#1b5d55] uppercase tracking-wider">Today's Leaves / Absentees</h3>
                                     <p className="text-slate-500 text-[10px] font-bold">
                                         Showing {leavesEmployees.filter(item => 
                                             (item.name || '').toLowerCase().includes(leavesSearchQuery.toLowerCase()) ||
@@ -993,13 +1089,13 @@ const AdminDashboard = () => {
                         {/* Search and Filters */}
                         <div className="p-4 border-b border-slate-50 bg-white">
                             <div className="relative group">
-                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={16} />
                                 <input
                                     type="text"
                                     placeholder="Search by name, department, or employee ID..."
                                     value={leavesSearchQuery}
                                     onChange={(e) => setLeavesSearchQuery(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-400"
+                                    className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700 placeholder:text-slate-400"
                                 />
                                 {leavesSearchQuery && (
                                     <button
@@ -1031,9 +1127,9 @@ const AdminDashboard = () => {
                                                             <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name}`} alt={item.name} />
                                                         </div>
                                                         <div>
-                                                            <h4 className="text-xs font-black text-slate-900 leading-none mb-1.5">{item.name}</h4>
+                                                            <h4 className="text-xs font-black text-[#154c46] leading-none mb-1.5">{item.name}</h4>
                                                             <div className="flex items-center gap-2 flex-wrap">
-                                                                <span className="text-[9px] text-indigo-600 font-black bg-indigo-50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">{item.employee_id || 'No ID'}</span>
+                                                                <span className="text-[9px] text-teal-500 font-black bg-teal-50 px-1.5 py-0.5 rounded-md uppercase tracking-wider">{item.employee_id || 'No ID'}</span>
                                                                 <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{item.department || 'General'}</span>
                                                             </div>
                                                         </div>
@@ -1054,7 +1150,7 @@ const AdminDashboard = () => {
                                             <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-emerald-100">
                                                 <Users size={28} />
                                             </div>
-                                            <h3 className="text-sm font-black text-slate-800 mb-1">Excellent! No leaves today</h3>
+                                            <h3 className="text-sm font-black text-[#1b5d55] mb-1">Excellent! No leaves today</h3>
                                             <p className="text-slate-400 text-xs font-medium max-w-sm mx-auto font-sans">
                                                 {leavesSearchQuery 
                                                     ? `No match found for "${leavesSearchQuery}". Try another search term.`

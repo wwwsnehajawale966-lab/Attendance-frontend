@@ -16,7 +16,9 @@ import {
     Save,
     Phone,
     User,
-    Sparkles
+    Sparkles,
+    UserPlus,
+    Trash2
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -102,7 +104,7 @@ const AdminLayout = () => {
     const fetchProfile = async () => {
         setIsLoadingProfile(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/me', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/me', {
                 headers: { 'x-auth-token': token }
             });
             if (res.ok) {
@@ -127,7 +129,7 @@ const AdminLayout = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/notifications', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/notifications', {
                 headers: { 'x-auth-token': token }
             });
             if (res.ok) {
@@ -143,7 +145,7 @@ const AdminLayout = () => {
 
     const handleNotificationRead = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'x-auth-token': token }
             });
@@ -155,9 +157,24 @@ const AdminLayout = () => {
         }
     };
 
+    const handleNotificationDelete = async (id, e) => {
+        if (e) e.stopPropagation();
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/notifications/${id}`, {
+                method: 'DELETE',
+                headers: { 'x-auth-token': token }
+            });
+            if (res.ok) {
+                fetchNotifications();
+            }
+        } catch (err) {
+            console.error('Error deleting notification:', err);
+        }
+    };
+
     const handleMarkAllNotificationsRead = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/notifications/read-all', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/notifications/read-all', {
                 method: 'PUT',
                 headers: { 'x-auth-token': token }
             });
@@ -169,12 +186,65 @@ const AdminLayout = () => {
         }
     };
 
+    const handleApproveRequest = async (userId, notificationId) => {
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/approve-employee/${userId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token 
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || 'Employee approved successfully!');
+                if (notificationId) {
+                    await handleNotificationRead(notificationId);
+                }
+                fetchNotifications();
+            } else {
+                alert(data.message || 'Failed to approve employee');
+            }
+        } catch (err) {
+            console.error('Error approving employee:', err);
+            alert('Error approving employee.');
+        }
+    };
+
+    const handleRejectRequest = async (userId, notificationId) => {
+        if (!window.confirm('Are you sure you want to reject this employee registration request? This will delete the pending account.')) {
+            return;
+        }
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/reject-employee/${userId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token 
+                }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || 'Request rejected and deleted.');
+                if (notificationId) {
+                    await handleNotificationRead(notificationId);
+                }
+                fetchNotifications();
+            } else {
+                alert(data.message || 'Failed to reject employee');
+            }
+        } catch (err) {
+            console.error('Error rejecting employee:', err);
+            alert('Error rejecting employee.');
+        }
+    };
+
     const handleSelfUpdateSubmit = async (e) => {
         e.preventDefault();
         setIsSelfUpdating(true);
         setSelfUpdateError('');
         try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,7 +277,7 @@ const AdminLayout = () => {
         }
         setIsSelfDeleting(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/profile', {
                 method: 'DELETE',
                 headers: {
                     'x-auth-token': token
@@ -245,12 +315,12 @@ const AdminLayout = () => {
                 isSidebarOpen ? "w-64" : "w-20"
             )}>
                 <div className="h-16 flex items-center px-6 border-b border-slate-100">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-100 ring-2 ring-indigo-50">
+                    <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-teal-50 ring-2 ring-teal-50">
                         A
                     </div>
                     {isSidebarOpen && (
-                        <span className="ml-3 font-bold text-slate-800 tracking-tight">
-                            Attendance<span className="text-indigo-600">Pro</span>
+                        <span className="ml-3 font-bold text-[#1b5d55] tracking-tight">
+                            Attendance<span className="text-teal-500">Pro</span>
                         </span>
                     )}
                 </div>
@@ -263,7 +333,7 @@ const AdminLayout = () => {
                                 <button
                                     key={item.title}
                                     onClick={() => setSettingsOpen(true)}
-                                    className="flex items-center w-full px-3 py-2.5 rounded-xl transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900 border-0 bg-transparent text-left cursor-pointer focus:outline-none"
+                                    className="flex items-center w-full px-3 py-2.5 rounded-xl transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-[#154c46] border-0 bg-transparent text-left cursor-pointer focus:outline-none"
                                 >
                                     <item.icon size={20} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
                                     {isSidebarOpen && <span className="ml-3 font-semibold text-sm">{item.title}</span>}
@@ -277,8 +347,8 @@ const AdminLayout = () => {
                                 className={cn(
                                     "flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group",
                                     isActive
-                                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100"
-                                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                                        ? "bg-teal-500 text-white shadow-lg shadow-teal-50"
+                                        : "text-slate-500 hover:bg-slate-50 hover:text-[#154c46]"
                                 )}
                             >
                                 <item.icon size={20} className={cn(
@@ -318,11 +388,11 @@ const AdminLayout = () => {
                             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
                         <div className="hidden md:flex items-center relative group">
-                            <Search className="absolute left-3 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
+                            <Search className="absolute left-3 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={16} />
                             <input
                                 type="text"
                                 placeholder="Quick search..."
-                                className="bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-indigo-100 focus:bg-white transition-all outline-none"
+                                className="bg-slate-50 border-none rounded-xl pl-10 pr-4 py-2 text-sm w-64 focus:ring-2 focus:ring-teal-50 focus:bg-white transition-all outline-none"
                             />
                         </div>
                     </div>
@@ -331,7 +401,7 @@ const AdminLayout = () => {
                         <div className="relative">
                             <button 
                                 onClick={() => setShowNotificationsDropdown(!showNotificationsDropdown)}
-                                className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all relative border-0 bg-transparent cursor-pointer"
+                                className="p-2 text-slate-400 hover:text-teal-500 hover:bg-teal-50 rounded-xl transition-all relative border-0 bg-transparent cursor-pointer"
                             >
                                 <Bell size={20} />
                                 {unreadNotificationsCount > 0 && (
@@ -344,11 +414,11 @@ const AdminLayout = () => {
                             {showNotificationsDropdown && (
                                 <div className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-100 shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-3 duration-300 font-sans">
                                     <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                                        <span className="text-xs font-black text-slate-800 uppercase tracking-wider">Notifications</span>
+                                        <span className="text-xs font-black text-[#1b5d55] uppercase tracking-wider">Notifications</span>
                                         {unreadNotificationsCount > 0 && (
                                             <button 
                                                 onClick={handleMarkAllNotificationsRead}
-                                                className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 bg-transparent border-0 cursor-pointer"
+                                                className="text-[10px] font-bold text-teal-500 hover:text-teal-600 bg-transparent border-0 cursor-pointer"
                                             >
                                                 Mark all as read
                                             </button>
@@ -360,16 +430,39 @@ const AdminLayout = () => {
                                                 <div 
                                                     key={n.id} 
                                                     onClick={() => !n.is_read && handleNotificationRead(n.id)}
-                                                    className={`p-4 text-left cursor-pointer transition-colors ${!n.is_read ? 'bg-indigo-50/40 hover:bg-indigo-50/70' : 'hover:bg-slate-50'}`}
+                                                    className={`p-4 text-left cursor-pointer transition-colors group relative ${!n.is_read ? 'bg-teal-50/40 hover:bg-teal-50/70' : 'hover:bg-slate-50'}`}
                                                 >
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <p className={`text-xs font-bold ${!n.is_read ? 'text-slate-900' : 'text-slate-600'}`}>{n.title}</p>
-                                                        {!n.is_read && <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full shrink-0 mt-1"></span>}
+                                                    <div className="flex items-start justify-between gap-2 pr-6">
+                                                        <p className={`text-xs font-bold ${!n.is_read ? 'text-[#154c46]' : 'text-slate-600'}`}>{n.title}</p>
+                                                        {!n.is_read && <span className="w-1.5 h-1.5 bg-teal-500 rounded-full shrink-0 mt-1"></span>}
                                                     </div>
-                                                    <p className="text-[11px] font-medium text-slate-500 mt-1 leading-relaxed">{n.message}</p>
+                                                    <p className="text-[11px] font-medium text-slate-500 mt-1 leading-relaxed pr-6">{n.message}</p>
+                                                    {n.title === 'New Employee Registration' && n.related_id && !n.is_read && (
+                                                        <div className="flex gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                                                            <button
+                                                                onClick={() => handleApproveRequest(n.related_id, n.id)}
+                                                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded-lg transition-colors border-0 cursor-pointer"
+                                                            >
+                                                                Approve
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleRejectRequest(n.related_id, n.id)}
+                                                                className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold rounded-lg transition-colors border-0 cursor-pointer"
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                     <span className="text-[9px] font-bold text-slate-400 tracking-wider uppercase mt-2 block">
                                                         {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </span>
+                                                    <button 
+                                                        onClick={(e) => handleNotificationDelete(n.id, e)}
+                                                        className="absolute top-4 right-4 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg opacity-0 md:group-hover:opacity-100 transition-all border-0 bg-transparent cursor-pointer flex md:hidden group-hover:flex md:block"
+                                                        title="Delete Notification"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
                                                 </div>
                                             ))
                                         ) : (
@@ -386,10 +479,10 @@ const AdminLayout = () => {
                             className="flex items-center space-x-3 border-l pl-5 border-slate-200 cursor-pointer group hover:opacity-85 transition-opacity"
                         >
                             <div className="text-right hidden sm:block">
-                                <p className="text-sm font-bold text-slate-800 leading-none group-hover:text-indigo-600 transition-colors">{user.name || 'Admin'}</p>
-                                <p className="text-[11px] font-bold text-indigo-600 uppercase tracking-widest mt-1">{user.role || 'Super Admin'}</p>
+                                <p className="text-sm font-bold text-[#1b5d55] leading-none group-hover:text-teal-500 transition-colors">{user.name || 'Admin'}</p>
+                                <p className="text-[11px] font-bold text-teal-500 uppercase tracking-widest mt-1">{user.role || 'Super Admin'}</p>
                             </div>
-                            <div className="w-10 h-10 bg-indigo-50 rounded-xl overflow-hidden border border-indigo-100 shadow-sm">
+                            <div className="w-10 h-10 bg-teal-50 rounded-xl overflow-hidden border border-teal-50 shadow-sm">
                                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'Admin'}`} alt="Avatar" />
                             </div>
                         </div>
@@ -404,15 +497,15 @@ const AdminLayout = () => {
 
             {/* Global Settings Modal */}
             {isSettingsOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 bg-[#154c46]/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full border border-slate-100 overflow-hidden transform transition-all duration-300 animate-in zoom-in-95">
                         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl animate-pulse">
+                                <div className="p-2 bg-teal-50 text-teal-500 rounded-xl animate-pulse">
                                     <Settings size={18} />
                                 </div>
                                 <div className="text-left">
-                                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">System Settings</h3>
+                                    <h3 className="text-sm font-black text-[#1b5d55] uppercase tracking-wider">System Settings</h3>
                                     <p className="text-slate-500 text-[10px] font-bold">Configure attendance guidelines.</p>
                                 </div>
                             </div>
@@ -436,12 +529,12 @@ const AdminLayout = () => {
                                 <div className="space-y-1 text-left">
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Late Arrival Threshold</label>
                                     <div className="relative group">
-                                        <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
+                                        <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={16} />
                                         <input
                                             type="time"
                                             value={settingsForm.lateTime}
                                             onChange={(e) => setSettingsForm({ ...settingsForm, lateTime: e.target.value })}
-                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
+                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
                                             required
                                         />
                                     </div>
@@ -450,14 +543,14 @@ const AdminLayout = () => {
                                 <div className="space-y-1 text-left">
                                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Minimum Daily Hours</label>
                                     <div className="relative group">
-                                        <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
+                                        <Shield className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-teal-500 transition-colors" size={16} />
                                         <input
                                             type="number"
                                             min="1"
                                             max="24"
                                             value={settingsForm.workingHoursRequired}
                                             onChange={(e) => setSettingsForm({ ...settingsForm, workingHoursRequired: e.target.value })}
-                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
+                                            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
                                             required
                                         />
                                     </div>
@@ -465,14 +558,14 @@ const AdminLayout = () => {
 
                                 <div className="pt-2 flex items-center justify-between">
                                     <div className="text-left">
-                                        <label className="block text-xs font-bold text-slate-800">Auto Check-in on Login</label>
+                                        <label className="block text-xs font-bold text-[#1b5d55]">Auto Check-in on Login</label>
                                         <p className="text-slate-400 text-[10px]">Automatically mark presence upon logging in.</p>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setSettingsForm({ ...settingsForm, autoCheckIn: !settingsForm.autoCheckIn })}
                                         className={`w-11 h-6 rounded-full transition-all duration-300 relative focus:outline-none border-0 cursor-pointer ${
-                                            settingsForm.autoCheckIn ? 'bg-indigo-600' : 'bg-slate-200'
+                                            settingsForm.autoCheckIn ? 'bg-teal-500' : 'bg-slate-200'
                                         }`}
                                     >
                                         <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-300 ${
@@ -484,14 +577,14 @@ const AdminLayout = () => {
                                 <div className="border-t border-slate-50 pt-4 space-y-4">
                                     <div className="flex items-center justify-between">
                                         <div className="text-left">
-                                            <label className="block text-xs font-bold text-slate-800">IP Restrict Check-In</label>
+                                            <label className="block text-xs font-bold text-[#1b5d55]">IP Restrict Check-In</label>
                                             <p className="text-slate-400 text-[10px]">Only allow check-in from company WiFi.</p>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => setSettingsForm({ ...settingsForm, ipRestriction: !settingsForm.ipRestriction })}
                                             className={`w-11 h-6 rounded-full transition-all duration-300 relative focus:outline-none border-0 cursor-pointer ${
-                                                settingsForm.ipRestriction ? 'bg-indigo-600' : 'bg-slate-200'
+                                                settingsForm.ipRestriction ? 'bg-teal-500' : 'bg-slate-200'
                                             }`}
                                         >
                                             <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-300 ${
@@ -508,7 +601,7 @@ const AdminLayout = () => {
                                                 value={settingsForm.allowedIp}
                                                 onChange={(e) => setSettingsForm({ ...settingsForm, allowedIp: e.target.value })}
                                                 placeholder="192.168.1.1"
-                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
+                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-teal-50 focus:border-teal-400 transition-all bg-slate-50/50 text-xs font-bold text-slate-700"
                                             />
                                         </div>
                                     )}
@@ -526,7 +619,7 @@ const AdminLayout = () => {
                                 <button
                                     type="submit"
                                     disabled={settingsSaving}
-                                    className="flex-1 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-indigo-600 font-bold text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-75 cursor-pointer border-0"
+                                    className="flex-1 py-2.5 bg-[#154c46] text-white rounded-xl hover:bg-teal-500 font-bold text-xs transition-all flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-75 cursor-pointer border-0"
                                 >
                                     {settingsSaving ? (
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -545,10 +638,10 @@ const AdminLayout = () => {
 
             {/* Premium Profile Modal */}
             {showProfileModal && profileData && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#154c46]/60 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
                     <div className="bg-white/95 rounded-3xl border border-slate-100 shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300 relative font-sans my-8">
                         {/* Elegant Pattern Banner */}
-                        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 p-8 text-white relative flex flex-col items-center">
+                        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-500 p-8 text-white relative flex flex-col items-center">
                             <div className="absolute top-4 right-4">
                                 <button 
                                     onClick={() => setShowProfileModal(false)}
@@ -573,7 +666,7 @@ const AdminLayout = () => {
                                     required
                                     value={selfEditData.name}
                                     onChange={(e) => setSelfEditData({ ...selfEditData, name: e.target.value })}
-                                    className="text-slate-800 text-sm font-bold text-center px-4 py-1 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"
+                                    className="text-[#1b5d55] text-sm font-bold text-center px-4 py-1 rounded-lg border border-slate-200 outline-none focus:border-teal-400 bg-white"
                                 />
                             ) : (
                                 <h3 className="text-xl font-black tracking-tight leading-none text-center">{profileData.name}</h3>
@@ -587,11 +680,11 @@ const AdminLayout = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Access Role</span>
-                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">{profileData.role}</span>
+                                    <span className="text-xs font-black text-[#1b5d55] uppercase tracking-wider">{profileData.role}</span>
                                 </div>
                                 <div className="space-y-1 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Department</span>
-                                    <span className="text-xs font-black text-slate-800 tracking-wider">{profileData.department || 'General'}</span>
+                                    <span className="text-xs font-black text-[#1b5d55] tracking-wider">{profileData.department || 'General'}</span>
                                 </div>
                             </div>
 
@@ -607,7 +700,7 @@ const AdminLayout = () => {
                                 <div className="space-y-4 pt-4 border-t border-slate-100">
                                     {/* Email */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Sparkles size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -618,7 +711,7 @@ const AdminLayout = () => {
                                                     required
                                                     value={selfEditData.email}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, email: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white"
                                                 />
                                             ) : (
                                                 <span className="text-xs font-bold text-slate-700">{profileData.email}</span>
@@ -628,7 +721,7 @@ const AdminLayout = () => {
 
                                     {/* Phone Number */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Phone size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -638,7 +731,7 @@ const AdminLayout = () => {
                                                     type="text"
                                                     value={selfEditData.phone}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, phone: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white"
                                                     placeholder="e.g. +91 9876543210"
                                                 />
                                             ) : (
@@ -649,7 +742,7 @@ const AdminLayout = () => {
 
                                     {/* Gender */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <User size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -658,7 +751,7 @@ const AdminLayout = () => {
                                                 <select
                                                     value={selfEditData.gender}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, gender: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white text-slate-700"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white text-slate-700"
                                                 >
                                                     <option value="">Select Gender</option>
                                                     <option value="Male">Male</option>
@@ -673,7 +766,7 @@ const AdminLayout = () => {
 
                                     {/* Joined Date */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Calendar size={16} />
                                         </div>
                                         <div className="text-left">
@@ -711,7 +804,7 @@ const AdminLayout = () => {
                                             <button
                                                 type="submit"
                                                 disabled={isSelfUpdating}
-                                                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-indigo-100 disabled:opacity-50"
+                                                className="flex-1 py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50 disabled:opacity-50"
                                             >
                                                 {isSelfUpdating ? 'Saving...' : 'Save Profile'}
                                             </button>
@@ -721,7 +814,7 @@ const AdminLayout = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setIsEditingSelf(true)}
-                                                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-indigo-100 text-center"
+                                                className="w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50 text-center"
                                             >
                                                 Edit Profile Info
                                             </button>
@@ -740,7 +833,7 @@ const AdminLayout = () => {
                                         <button
                                             type="button"
                                             onClick={() => setShowProfileModal(false)}
-                                            className="w-full py-3 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-indigo-100/30 border-0 cursor-pointer"
+                                            className="w-full py-3 bg-[#154c46] hover:bg-teal-500 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-teal-50/30 border-0 cursor-pointer"
                                         >
                                             Close Details
                                         </button>

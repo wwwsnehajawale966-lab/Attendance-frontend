@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, History, LogOut, Phone, User, Sparkles, Calendar, X, Bell } from 'lucide-react';
+import { Home, History, LogOut, Phone, User, Sparkles, Calendar, X, Bell, Trash2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -60,7 +60,7 @@ const EmployeeLayout = () => {
     const fetchProfile = async () => {
         setIsLoadingProfile(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/me', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/me', {
                 headers: { 'x-auth-token': token }
             });
             if (res.ok) {
@@ -85,7 +85,7 @@ const EmployeeLayout = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/notifications', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/notifications', {
                 headers: { 'x-auth-token': token }
             });
             if (res.ok) {
@@ -101,7 +101,7 @@ const EmployeeLayout = () => {
 
     const handleNotificationRead = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/notifications/${id}/read`, {
                 method: 'PUT',
                 headers: { 'x-auth-token': token }
             });
@@ -113,9 +113,24 @@ const EmployeeLayout = () => {
         }
     };
 
+    const handleNotificationDelete = async (id, e) => {
+        if (e) e.stopPropagation();
+        try {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/notifications/${id}`, {
+                method: 'DELETE',
+                headers: { 'x-auth-token': token }
+            });
+            if (res.ok) {
+                fetchNotifications();
+            }
+        } catch (err) {
+            console.error('Error deleting notification:', err);
+        }
+    };
+
     const handleMarkAllNotificationsRead = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/notifications/read-all', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/notifications/read-all', {
                 method: 'PUT',
                 headers: { 'x-auth-token': token }
             });
@@ -132,7 +147,7 @@ const EmployeeLayout = () => {
         setIsSelfUpdating(true);
         setSelfUpdateError('');
         try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -165,7 +180,7 @@ const EmployeeLayout = () => {
         }
         setIsSelfDeleting(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/profile', {
+            const res = await fetch('https://attendance-backend-0jxv.onrender.com/api/auth/profile', {
                 method: 'DELETE',
                 headers: {
                     'x-auth-token': token
@@ -198,17 +213,17 @@ const EmployeeLayout = () => {
             {/* Top Mobile/Header */}
             <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-50">
                 <div className="flex items-center">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-100">
+                    <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-teal-50">
                         E
                     </div>
-                    <span className="ml-3 font-bold text-slate-800 tracking-tight">Attendance<span className="text-indigo-600">Pro</span></span>
+                    <span className="ml-3 font-bold text-[#1b5d55] tracking-tight">Attendance<span className="text-teal-500">Pro</span></span>
                 </div>
                 <div className="flex items-center space-x-4">
                     {/* Bell Icon & Notifications */}
                     <div className="relative">
                         <button 
                             onClick={() => setShowNotificationsDropdown(!showNotificationsDropdown)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all relative border-0 bg-transparent cursor-pointer"
+                            className="p-2 text-slate-400 hover:text-teal-500 hover:bg-teal-50 rounded-xl transition-all relative border-0 bg-transparent cursor-pointer"
                         >
                             <Bell size={20} />
                             {unreadNotificationsCount > 0 && (
@@ -221,11 +236,11 @@ const EmployeeLayout = () => {
                         {showNotificationsDropdown && (
                             <div className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-100 shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-3 duration-300 font-sans">
                                 <div className="px-5 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">Notifications</span>
+                                    <span className="text-xs font-black text-[#1b5d55] uppercase tracking-wider">Notifications</span>
                                     {unreadNotificationsCount > 0 && (
                                         <button 
                                             onClick={handleMarkAllNotificationsRead}
-                                            className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 bg-transparent border-0 cursor-pointer"
+                                            className="text-[10px] font-bold text-teal-500 hover:text-teal-600 bg-transparent border-0 cursor-pointer"
                                         >
                                             Mark all as read
                                         </button>
@@ -237,16 +252,23 @@ const EmployeeLayout = () => {
                                             <div 
                                                 key={n.id} 
                                                 onClick={() => !n.is_read && handleNotificationRead(n.id)}
-                                                className={`p-4 text-left cursor-pointer transition-colors ${!n.is_read ? 'bg-indigo-50/40 hover:bg-indigo-50/70' : 'hover:bg-slate-50'}`}
+                                                className={`p-4 text-left cursor-pointer transition-colors group relative ${!n.is_read ? 'bg-teal-50/40 hover:bg-teal-50/70' : 'hover:bg-slate-50'}`}
                                             >
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <p className={`text-xs font-bold ${!n.is_read ? 'text-slate-900' : 'text-slate-600'}`}>{n.title}</p>
-                                                    {!n.is_read && <span className="w-1.5 h-1.5 bg-indigo-600 rounded-full shrink-0 mt-1"></span>}
+                                                <div className="flex items-start justify-between gap-2 pr-6">
+                                                    <p className={`text-xs font-bold ${!n.is_read ? 'text-[#154c46]' : 'text-slate-600'}`}>{n.title}</p>
+                                                    {!n.is_read && <span className="w-1.5 h-1.5 bg-teal-500 rounded-full shrink-0 mt-1"></span>}
                                                 </div>
-                                                <p className="text-[11px] font-medium text-slate-500 mt-1 leading-relaxed text-left">{n.message}</p>
+                                                <p className="text-[11px] font-medium text-slate-500 mt-1 leading-relaxed text-left pr-6">{n.message}</p>
                                                 <span className="text-[9px] font-bold text-slate-400 tracking-wider uppercase mt-2 block text-left">
                                                     {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
+                                                <button 
+                                                    onClick={(e) => handleNotificationDelete(n.id, e)}
+                                                    className="absolute top-4 right-4 p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg opacity-0 md:group-hover:opacity-100 transition-all border-0 bg-transparent cursor-pointer flex md:hidden group-hover:flex md:block"
+                                                    title="Delete Notification"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
                                             </div>
                                         ))
                                     ) : (
@@ -263,7 +285,7 @@ const EmployeeLayout = () => {
                         onClick={fetchProfile}
                         className="flex items-center space-x-3 cursor-pointer group hover:opacity-85 transition-opacity border-l pl-3 border-slate-200"
                     >
-                        <span className="text-sm font-semibold text-slate-600 group-hover:text-indigo-600 transition-colors hidden sm:block">{user.name}</span>
+                        <span className="text-sm font-semibold text-slate-600 group-hover:text-teal-500 transition-colors hidden sm:block">{user.name}</span>
                         <div className="w-8 h-8 bg-slate-200 rounded-full overflow-hidden border border-slate-100">
                             <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'User'}`} alt="Avatar" />
                         </div>
@@ -283,8 +305,8 @@ const EmployeeLayout = () => {
                                 className={cn(
                                     "flex items-center px-4 py-3 rounded-xl transition-all duration-200",
                                     location.pathname === item.path
-                                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100"
-                                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                                        ? "bg-teal-500 text-white shadow-lg shadow-teal-50"
+                                        : "text-slate-500 hover:bg-slate-50 hover:text-[#154c46]"
                                 )}
                             >
                                 <item.icon size={20} className="mr-3" />
@@ -316,7 +338,7 @@ const EmployeeLayout = () => {
                         to={item.path}
                         className={cn(
                             "flex flex-col items-center justify-center space-y-1 transition-colors",
-                            location.pathname === item.path ? "text-indigo-600" : "text-slate-400"
+                            location.pathname === item.path ? "text-teal-500" : "text-slate-400"
                         )}
                     >
                         <item.icon size={22} />
@@ -334,10 +356,10 @@ const EmployeeLayout = () => {
 
             {/* Premium Profile Modal */}
             {showProfileModal && profileData && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#154c46]/60 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
                     <div className="bg-white/95 rounded-3xl border border-slate-100 shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300 relative font-sans my-8">
                         {/* Elegant Pattern Banner */}
-                        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 p-8 text-white relative flex flex-col items-center">
+                        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-teal-500 p-8 text-white relative flex flex-col items-center">
                             <div className="absolute top-4 right-4">
                                 <button 
                                     onClick={() => setShowProfileModal(false)}
@@ -362,7 +384,7 @@ const EmployeeLayout = () => {
                                     required
                                     value={selfEditData.name}
                                     onChange={(e) => setSelfEditData({ ...selfEditData, name: e.target.value })}
-                                    className="text-slate-800 text-sm font-bold text-center px-4 py-1 rounded-lg border border-slate-200 outline-none focus:border-indigo-500 bg-white"
+                                    className="text-[#1b5d55] text-sm font-bold text-center px-4 py-1 rounded-lg border border-slate-200 outline-none focus:border-teal-400 bg-white"
                                 />
                             ) : (
                                 <h3 className="text-xl font-black tracking-tight leading-none text-center">{profileData.name}</h3>
@@ -376,11 +398,11 @@ const EmployeeLayout = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Access Role</span>
-                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">{profileData.role}</span>
+                                    <span className="text-xs font-black text-[#1b5d55] uppercase tracking-wider">{profileData.role}</span>
                                 </div>
                                 <div className="space-y-1 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Department</span>
-                                    <span className="text-xs font-black text-slate-800 tracking-wider">{profileData.department || 'General'}</span>
+                                    <span className="text-xs font-black text-[#1b5d55] tracking-wider">{profileData.department || 'General'}</span>
                                 </div>
                             </div>
 
@@ -396,7 +418,7 @@ const EmployeeLayout = () => {
                                 <div className="space-y-4 pt-4 border-t border-slate-100">
                                     {/* Email */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Sparkles size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -407,7 +429,7 @@ const EmployeeLayout = () => {
                                                     required
                                                     value={selfEditData.email}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, email: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white"
                                                 />
                                             ) : (
                                                 <span className="text-xs font-bold text-slate-700">{profileData.email}</span>
@@ -417,7 +439,7 @@ const EmployeeLayout = () => {
 
                                     {/* Phone Number */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Phone size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -427,7 +449,7 @@ const EmployeeLayout = () => {
                                                     type="text"
                                                     value={selfEditData.phone}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, phone: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white"
                                                     placeholder="e.g. +91 9876543210"
                                                 />
                                             ) : (
@@ -438,7 +460,7 @@ const EmployeeLayout = () => {
 
                                     {/* Gender */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <User size={16} />
                                         </div>
                                         <div className="text-left flex-1">
@@ -447,7 +469,7 @@ const EmployeeLayout = () => {
                                                 <select
                                                     value={selfEditData.gender}
                                                     onChange={(e) => setSelfEditData({ ...selfEditData, gender: e.target.value })}
-                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 text-xs font-semibold bg-white text-slate-700"
+                                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-50 focus:border-teal-400 text-xs font-semibold bg-white text-slate-700"
                                                 >
                                                     <option value="">Select Gender</option>
                                                     <option value="Male">Male</option>
@@ -462,7 +484,7 @@ const EmployeeLayout = () => {
 
                                     {/* Joined Date */}
                                     <div className="flex items-center gap-3.5 p-3.5 hover:bg-slate-50 rounded-2xl transition-all duration-300 border border-transparent hover:border-slate-100">
-                                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
+                                        <div className="p-2.5 bg-teal-50 text-teal-500 rounded-xl">
                                             <Calendar size={16} />
                                         </div>
                                         <div className="text-left">
@@ -500,7 +522,7 @@ const EmployeeLayout = () => {
                                             <button
                                                 type="submit"
                                                 disabled={isSelfUpdating}
-                                                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-indigo-100 disabled:opacity-50"
+                                                className="flex-1 py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50 disabled:opacity-50"
                                             >
                                                 {isSelfUpdating ? 'Saving...' : 'Save Profile'}
                                             </button>
@@ -510,7 +532,7 @@ const EmployeeLayout = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setIsEditingSelf(true)}
-                                                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-indigo-100 text-center"
+                                                className="w-full py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all border-0 cursor-pointer shadow-md shadow-teal-50 text-center"
                                             >
                                                 Edit Profile Info
                                             </button>
@@ -529,7 +551,7 @@ const EmployeeLayout = () => {
                                         <button
                                             type="button"
                                             onClick={() => setShowProfileModal(false)}
-                                            className="w-full py-3 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-indigo-100/30 border-0 cursor-pointer"
+                                            className="w-full py-3 bg-[#154c46] hover:bg-teal-500 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-lg shadow-teal-50/30 border-0 cursor-pointer"
                                         >
                                             Close Details
                                         </button>

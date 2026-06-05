@@ -17,7 +17,7 @@ const ManageAttendance = () => {
         setIsLoading(true);
         try {
             const queryParams = new URLSearchParams(filters).toString();
-            const res = await fetch(`http://localhost:5000/api/admin/report?${queryParams}`, {
+            const res = await fetch(`https://attendance-backend-0jxv.onrender.com/api/admin/report?${queryParams}`, {
                 headers: { 'x-auth-token': token }
             });
             const data = await res.json();
@@ -152,20 +152,20 @@ const ManageAttendance = () => {
 
     const renderExtraWork = (extra) => {
         if (!extra || extra === 'N/A') return <span className="text-slate-400 font-bold">N/A</span>;
-        return <span className="text-indigo-600 font-bold">{extra}</span>;
+        return <span className="text-teal-500 font-bold">{extra}</span>;
     };
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500 font-sans">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Attendance Reports</h1>
+                    <h1 className="text-2xl font-bold text-[#1b5d55] tracking-tight">Attendance Reports</h1>
                     <p className="text-slate-500 text-sm font-medium mt-1">Detailed logs of all employee movements.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     <button 
                         onClick={exportCSV}
-                        className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 border-0 cursor-pointer shadow-md shadow-indigo-100"
+                        className="px-4 py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 border-0 cursor-pointer shadow-md shadow-teal-50"
                     >
                         <FileText size={16} />
                         Export CSV
@@ -197,7 +197,7 @@ const ManageAttendance = () => {
                 </div>
                 <button
                     onClick={fetchReports}
-                    className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-indigo-600 transition-all flex items-center gap-2"
+                    className="px-6 py-2.5 bg-[#154c46] text-white rounded-xl text-xs font-bold hover:bg-teal-500 transition-all flex items-center gap-2"
                 >
                     <Filter size={16} />
                     Apply Filters
@@ -231,11 +231,11 @@ const ManageAttendance = () => {
                                     <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold overflow-hidden">
+                                                <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-500 font-bold overflow-hidden">
                                                     <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name}`} alt="avatar" />
                                                 </div>
                                                 <div>
-                                                    <div className="text-xs font-bold text-slate-900">{item.name}</div>
+                                                    <div className="text-xs font-bold text-[#154c46]">{item.name}</div>
                                                     <div className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{item.employee_id}</div>
                                                 </div>
                                             </div>
@@ -252,7 +252,7 @@ const ManageAttendance = () => {
                                         </td>
                                         <td className="px-6 py-4 text-xs font-bold text-slate-600">
                                             {item.check_out ? (
-                                                <span className="inline-flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg text-[10px] uppercase font-black">
+                                                <span className="inline-flex items-center gap-1 text-teal-500 bg-teal-50 px-2 py-1 rounded-lg text-[10px] uppercase font-black">
                                                     {new Date(item.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                             ) : '--'}
@@ -260,7 +260,7 @@ const ManageAttendance = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
                                                 <Clock size={14} className="text-slate-300" />
-                                                <span className="text-xs font-black text-slate-900">{item.working_hours || '--'}</span>
+                                                <span className="text-xs font-black text-[#154c46]">{item.working_hours || '--'}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -285,7 +285,7 @@ const ManageAttendance = () => {
                                                     href={`https://maps.google.com/?q=${item.latitude},${item.longitude}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 border-0 cursor-pointer text-center"
+                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-500 text-teal-500 hover:text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all duration-300 border-0 cursor-pointer text-center"
                                                 >
                                                     View Location
                                                 </a>
