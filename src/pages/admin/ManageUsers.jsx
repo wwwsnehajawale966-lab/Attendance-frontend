@@ -360,7 +360,7 @@ const ManageUsers = () => {
         setSelectedEmployee(employee);
         setAnalyticsData(null);
         setDateRange({ startDate: '', endDate: '' });
-        if (employee.status !== 'pending') {
+        if (employee.status?.toLowerCase() !== 'pending') {
             fetchAnalytics(employee.id);
         }
         setAnalyticsOpen(true);
@@ -600,7 +600,7 @@ const ManageUsers = () => {
                                             <span className="text-xs font-bold text-slate-500 uppercase">{user.department || 'General'}</span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${user.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${user.status?.toLowerCase() === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
                                                 {user.status || 'Approved'}
                                             </span>
                                         </td>
@@ -671,7 +671,7 @@ const ManageUsers = () => {
 
                         {/* Modal Scrollable Container */}
                         <div className="p-8 overflow-y-auto space-y-6 flex-1">
-                            {selectedEmployee?.status === 'pending' ? (
+                            {selectedEmployee?.status?.toLowerCase() === 'pending' ? (
                                 <div className="text-center py-10 space-y-6">
                                     <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <AlertCircle size={40} />
